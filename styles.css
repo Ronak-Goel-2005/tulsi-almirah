@@ -1,0 +1,28 @@
+:root {
+  color-scheme: light;
+  --ink: #173122;
+  --muted: #506356;
+  --green: #17613a;
+  --deep-green: #173c28;
+  --lime: #c9ed83;
+  --paper: #fbfcf7;
+  --line: #dce5d5;
+  --red: #a8282c;
+  --sans: "Segoe UI", system-ui, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 1rem/1.55 var(--sans); }
+h1, h2, h3, p, figure { margin: 0; }
+h1, h2, h3 { font-weight: 720; }
+h2 { font-size: clamp(2.25rem, 5vw, 4.1rem); line-height: 1; letter-spacing: -.061em; }
+a { color: inherit; }
+button { font: inherit; cursor: pointer; }
+img { display: block; max-width: 100%; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 4px; }
+section[id] { scroll-margin-top: 1rem; }
+.wrap { width: min(100% - 7rem, 1240px); margin-inline: auto; }
+.skip:not(:focus) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.skip:focus { position: absolute; z-index: 4; top: 1rem; left: 1rem; padding: .5rem 1rem; background: white; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem; }
