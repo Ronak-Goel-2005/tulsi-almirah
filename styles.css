@@ -26,3 +26,21 @@ section[id] { scroll-margin-top: 1rem; }
 .skip:not(:focus) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .skip:focus { position: absolute; z-index: 4; top: 1rem; left: 1rem; padding: .5rem 1rem; background: white; }
 .actions { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem; }
+
+.site-header, .site-footer { background: white; }
+.header-inner, .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.header-inner { min-height: 84px; }
+.header-inner .brand img { width: 111px; height: auto; }
+.brand { display: inline-block; flex: 0 0 auto; }
+nav { display: flex; align-items: center; gap: 2.2rem; font-weight: 640; }
+nav a { display: flex; align-items: center; min-height: 44px; text-decoration: none; }
+nav a:hover { text-decoration: underline; text-underline-offset: .3rem; }
+.button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: .68rem 1.08rem; border: 1px solid transparent; border-radius: 6px; font-size: .94rem; font-weight: 700; line-height: 1.22; text-decoration: none; text-align: center; }
+.button-green { background: var(--green); color: white; }
+.button-green:hover { background: #114d2d; }
+.button-outline { border-color: #9aab97; color: var(--ink); }
+.button-outline:hover { background: #e9f1de; }
+.button-lime { background: var(--lime); color: var(--ink); }
+.button-lime:hover { background: #dcf6ac; }
+.button-light-outline { border-color: #a3bbab; color: white; }
+.button-light-outline:hover { background: #28563c; }
