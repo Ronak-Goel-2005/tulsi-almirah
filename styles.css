@@ -44,3 +44,21 @@ nav a:hover { text-decoration: underline; text-underline-offset: .3rem; }
 .button-lime:hover { background: #dcf6ac; }
 .button-light-outline { border-color: #a3bbab; color: white; }
 .button-light-outline:hover { background: #28563c; }
+
+.hero { padding-block: 1.1rem; background: #f1f6e8; }
+.hero-inner { display: grid; grid-template-columns: 1.06fr 1fr; align-items: center; gap: clamp(1.5rem, 4vw, 4rem); }
+.hero-copy { padding-block: 2.2rem; }
+h1 { font-size: clamp(3.35rem, 6.5vw, 6rem); line-height: .98; letter-spacing: -.072em; text-wrap: balance; }
+.hero-copy > p { max-width: 36ch; margin-top: 1.35rem; color: var(--muted); font-size: clamp(1.04rem, 1.6vw, 1.25rem); }
+.hero-copy .actions { margin-top: 1.65rem; }
+.hero-stage { position: relative; display: grid; place-items: center; overflow: hidden; min-height: clamp(410px, 38vw, 550px); border-radius: 9px; isolation: isolate; background: #d8edb6; }
+.hero-stage::before { content: ""; position: absolute; z-index: -1; width: 86%; aspect-ratio: 1; border: 1px solid #96b87a; border-radius: 50%; top: 6%; right: -20%; box-shadow: 0 0 0 40px #bad893, 0 0 0 41px #a7c888; background: #c7e3a4; }
+.hero-stage::after { content: ""; position: absolute; z-index: -1; bottom: 0; width: 100%; height: 18%; background: #bdd7a2; border-top: 1px solid #acce94; }
+.hero-photo { margin-block: 1.5rem 2.5rem; }
+.hero-photo img { width: auto; height: clamp(320px, 30vw, 435px); box-shadow: 14px 15px 21px #23452b4a; }
+.hero-stage figcaption { position: absolute; bottom: .75rem; right: .95rem; z-index: 1; color: #2b4631; font-size: .8125rem; font-weight: 650; }
+.spec-strip { background: #e1efca; border-bottom: 1px solid #d7e6c4; }
+.spec-strip ul { display: grid; grid-template-columns: repeat(3, 1fr); list-style: none; margin-block: 0; padding: .9rem 0; }
+.spec-strip li { display: flex; justify-content: center; align-items: center; gap: .55rem; min-height: 32px; padding-inline: .7rem; text-align: center; font-weight: 660; }
+.spec-strip li + li { border-left: 1px solid #b8cda3; }
+.spec-strip span { flex: 0 0 auto; width: 7px; height: 7px; background: var(--green); transform: rotate(45deg); border-radius: 1px; }
