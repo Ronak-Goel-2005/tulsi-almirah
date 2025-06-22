@@ -62,3 +62,24 @@ h1 { font-size: clamp(3.35rem, 6.5vw, 6rem); line-height: .98; letter-spacing: -
 .spec-strip li { display: flex; justify-content: center; align-items: center; gap: .55rem; min-height: 32px; padding-inline: .7rem; text-align: center; font-weight: 660; }
 .spec-strip li + li { border-left: 1px solid #b8cda3; }
 .spec-strip span { flex: 0 0 auto; width: 7px; height: 7px; background: var(--green); transform: rotate(45deg); border-radius: 1px; }
+
+.collection { padding-block: clamp(3.5rem, 6vw, 5.8rem); }
+.collection-heading p { color: var(--muted); margin-top: .7rem; }
+.filter-bar { display: flex; align-items: center; justify-content: space-between; gap: .7rem 1.5rem; margin: 1.65rem 0 1.2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
+.filters { display: flex; flex-wrap: wrap; gap: .45rem; }
+.filters button { min-height: 44px; padding: .45rem .9rem; color: var(--ink); background: white; border: 1px solid #bccbb8; border-radius: 5px; font-size: .9rem; font-weight: 640; }
+.filters button:hover { background: #e9f1de; }
+.filters button[aria-pressed="true"] { background: var(--deep-green); border-color: var(--deep-green); color: white; }
+#filter-status { flex: 0 0 auto; color: var(--muted); font-size: .9rem; }
+.catalogue { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(.8rem, 2vw, 1.45rem); }
+.product { display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--line); border-radius: 8px; background: white; overflow: hidden; }
+.product-image { display: grid; place-items: center; height: clamp(250px, 25vw, 335px); padding: 1.15rem; background: #ebf1e6; }
+.product:nth-child(3n + 2) .product-image { background: #f3ede7; }
+.product:nth-child(3n) .product-image { background: #eef0e5; }
+.product-image img { width: 100%; height: 100%; object-fit: contain; min-height: 0; filter: drop-shadow(5px 8px 4px #182f221b); }
+.product-copy { display: flex; flex: 1; flex-direction: column; align-items: flex-start; padding: .95rem 1.15rem .9rem; }
+.product-type { color: #3e6250; font-size: .875rem; font-weight: 650; margin-bottom: .18rem; }
+.product h3 { font-size: clamp(1.3rem, 2vw, 1.65rem); line-height: 1.16; letter-spacing: -.037em; }
+.product-description { color: var(--muted); margin: .4rem 0 .7rem; }
+.model-button { min-height: 44px; margin-top: auto; padding: .44rem .73rem; color: var(--green); border: 1px solid #bcd0b9; border-radius: 5px; background: white; font-size: .9rem; font-weight: 700; }
+.model-button:hover { background: #e8f3df; }
