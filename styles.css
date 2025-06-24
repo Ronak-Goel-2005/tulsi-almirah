@@ -83,3 +83,14 @@ h1 { font-size: clamp(3.35rem, 6.5vw, 6rem); line-height: .98; letter-spacing: -
 .product-description { color: var(--muted); margin: .4rem 0 .7rem; }
 .model-button { min-height: 44px; margin-top: auto; padding: .44rem .73rem; color: var(--green); border: 1px solid #bcd0b9; border-radius: 5px; background: white; font-size: .9rem; font-weight: 700; }
 .model-button:hover { background: #e8f3df; }
+
+.showroom { background: var(--deep-green); color: white; }
+.showroom-inner { display: grid; grid-template-columns: 1.35fr 1fr; align-items: center; gap: 2.5rem; padding-block: clamp(2.7rem, 6vw, 5rem); }
+.showroom-copy > p { color: #e3eee3; max-width: 42ch; margin-block: .8rem 1.35rem; }
+.showroom-details { border: 1px solid #779482; border-radius: 8px; padding: 1.4rem; }
+.showroom-details h3 { font-size: 1.35rem; }
+.showroom-details address { margin-block: .4rem .65rem; color: #e3eee3; font-style: normal; }
+.showroom-details a { display: inline-flex; align-items: center; min-height: 44px; color: #d8f5b0; text-underline-offset: .22rem; }
+.showroom :focus-visible { outline-color: var(--lime); }
+.footer-inner { min-height: 93px; }
+.footer-inner p { color: var(--muted); font-size: .875rem; }
