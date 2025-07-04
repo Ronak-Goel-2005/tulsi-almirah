@@ -1,14 +1,22 @@
 # Tulsi Almirah
 
-A responsive storefront for Tulsi Almirah in Hind, Uttar Pradesh. Browse twelve steel almirahs, compare front and open views, and contact the shop about a model.
+A responsive storefront for Tulsi Almirah in Hind, Uttar Pradesh.
+
+## Features
+
+- Animated almirah doors frame the opening logo. Click or tap anywhere to enter early, or use the keyboard. The intro is skipped when reduced motion is enabled.
+- Filter the catalogue of twelve steel almirahs and compare front and interior photos for each model.
+- Open a model-specific WhatsApp enquiry, call the shop, or get directions to the showroom.
 
 ## Run locally
 
-From the repository root, start a static file server:
+With Python installed, run this from the repository root:
 
-    python -m http.server 8000
+```sh
+python -m http.server 8000
+```
 
-Open http://localhost:8000. The site uses HTML, CSS and JavaScript with no build step.
+Open [http://localhost:8000](http://localhost:8000). The site uses HTML, CSS and vanilla JavaScript with no build step.
 
 ## Catalogue imagery
 

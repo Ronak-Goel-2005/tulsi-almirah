@@ -11,6 +11,13 @@
   <script type="module" src="catalogue.mjs"></script>
 </head>
 <body>
+  <div class="site-intro" hidden>
+    <button class="site-intro-button" type="button" aria-label="Skip intro">
+      <span class="site-intro-mark">
+        <img src="assets/tulsi-logo.webp" width="138" height="83" alt="">
+      </span>
+    </button>
+  </div>
   <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="wrap header-inner">
@@ -23,7 +30,7 @@
     </div>
   </header>
 
-  <main id="main">
+  <main id="main" tabindex="-1">
     <section class="hero" aria-labelledby="hero-heading">
       <div class="wrap hero-inner">
         <div class="hero-copy">
@@ -35,10 +42,7 @@
           </div>
         </div>
         <figure class="hero-stage">
-          <div class="hero-photo">
-            <img src="assets/tulsi-cover.webp" width="319" height="439" alt="Red Tulsi steel almirah with a mirror, hanging rail and shelves" fetchpriority="high">
-          </div>
-          <figcaption>From the Tulsi catalogue</figcaption>
+          <img class="hero-photo" src="assets/tulsi-cover.webp" width="319" height="439" alt="Red Tulsi steel almirah with a mirror, hanging rail and shelves" fetchpriority="high">
         </figure>
       </div>
     </section>
@@ -84,7 +88,7 @@
             <img src="assets/42-hero-mirror.webp" alt="Tulsi 42 Hero Mirror almirah, front view" width="350" height="535" loading="lazy">
           </div>
           <div class="product-copy">
-            <p class="product-type">Two-door ? Mirror</p>
+            <p class="product-type">Two-door &middot; Mirror</p>
             <h3>42 Hero Mirror</h3>
             <p class="product-description">Mirror, bangle box and two exterior drawers.</p>
             <button class="model-button" type="button" data-view-model aria-label="View 42 Hero Mirror">View model</button>
@@ -139,7 +143,7 @@
             <img src="assets/42-dressing.webp" alt="Tulsi 42 Dressing almirah, front view" width="350" height="535" loading="lazy">
           </div>
           <div class="product-copy">
-            <p class="product-type">Dressing ? Mirror</p>
+            <p class="product-type">Dressing &middot; Mirror</p>
             <h3>42 Dressing</h3>
             <p class="product-description">Full dressing almirah with an integrated mirror.</p>
             <button class="model-button" type="button" data-view-model aria-label="View 42 Dressing">View model</button>
@@ -161,7 +165,7 @@
             <img src="assets/48-hero-mirror.webp" alt="Tulsi 48 Hero Mirror almirah, front view" width="350" height="535" loading="lazy">
           </div>
           <div class="product-copy">
-            <p class="product-type">Three-door ? Mirror</p>
+            <p class="product-type">Three-door &middot; Mirror</p>
             <h3>48 Hero Mirror</h3>
             <p class="product-description">Mirror, bangle box and two exterior drawers.</p>
             <button class="model-button" type="button" data-view-model aria-label="View 48 Hero Mirror">View model</button>
@@ -172,7 +176,7 @@
             <img src="assets/48-king-mirror.webp" alt="Tulsi 48 King Mirror almirah, front view" width="350" height="535" loading="lazy">
           </div>
           <div class="product-copy">
-            <p class="product-type">Three-door ? Mirror</p>
+            <p class="product-type">Three-door &middot; Mirror</p>
             <h3>48 King Mirror</h3>
             <p class="product-description">Upper storage, two exterior drawers, a mirror and a bangle box.</p>
             <button class="model-button" type="button" data-view-model aria-label="View 48 King Mirror">View model</button>
@@ -194,7 +198,7 @@
             <img src="assets/48-classic.webp" alt="Tulsi 48 Classic almirah, front view" width="350" height="535" loading="lazy">
           </div>
           <div class="product-copy">
-            <p class="product-type">Dressing ? Mirror</p>
+            <p class="product-type">Dressing &middot; Mirror</p>
             <h3>48 Classic</h3>
             <p class="product-description">Full dressing almirah with a mirror and exterior drawers.</p>
             <button class="model-button" type="button" data-view-model aria-label="View 48 Classic">View model</button>
@@ -232,7 +236,7 @@
   <dialog id="model-dialog" aria-labelledby="model-title">
     <div class="dialog-header">
       <h2 id="model-title"></h2>
-      <form method="dialog"><button class="close" aria-label="Close model details" autofocus>?</button></form>
+      <form method="dialog"><button class="close" aria-label="Close model details" autofocus>&times;</button></form>
     </div>
     <p id="model-description"></p>
     <div class="model-photos">

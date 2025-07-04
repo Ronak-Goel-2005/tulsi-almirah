@@ -8,9 +8,38 @@ export function buildEnquiry(model) {
 }
 
 if (typeof document !== 'undefined') {
+  const intro = document.querySelector('.site-intro');
+  const skipIntro = intro.querySelector('button');
+  const motionPreference = matchMedia('(prefers-reduced-motion: no-preference)');
+
+  function finishIntro() {
+    const restoreFocus = document.activeElement === skipIntro;
+    intro.hidden = true;
+    if (restoreFocus) document.querySelector('#main').focus({ preventScroll: true });
+  }
+
+  skipIntro.addEventListener('click', () => {
+    const [fade] = intro.getAnimations();
+    if (fade) {
+      // Advance past the hold while keeping any fade already in progress.
+      fade.currentTime = Math.max(fade.currentTime ?? 0, fade.effect.getTiming().delay);
+    } else {
+      finishIntro();
+    }
+  });
+  skipIntro.addEventListener('focusout', (event) => {
+    if (event.relatedTarget) intro.hidden = true;
+  });
+  intro.addEventListener('animationend', (event) => {
+    if (event.target === intro) finishIntro();
+  });
+  if (motionPreference.matches) intro.hidden = false;
+
   const filters = [...document.querySelectorAll('[data-filter]')];
   const products = [...document.querySelectorAll('[data-categories]')];
+  const catalogue = document.querySelector('.catalogue');
   const filterStatus = document.querySelector('#filter-status');
+  let filterAnimation;
   const dialog = document.querySelector('#model-dialog');
   const modelTitle = document.querySelector('#model-title');
   const modelDescription = document.querySelector('#model-description');
@@ -21,6 +50,8 @@ if (typeof document !== 'undefined') {
 
   for (const filter of filters) {
     filter.addEventListener('click', () => {
+      if (filter.getAttribute('aria-pressed') === 'true') return;
+
       for (const button of filters) {
         button.setAttribute('aria-pressed', String(button === filter));
       }
@@ -30,6 +61,14 @@ if (typeof document !== 'undefined') {
         visible += Number(!product.hidden);
       }
       filterStatus.textContent = `${visible} ${visible === 1 ? 'model' : 'models'}`;
+
+      filterAnimation?.cancel();
+      if (motionPreference.matches) {
+        filterAnimation = catalogue.animate(
+          [{ opacity: 0.65, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }],
+          { duration: 280, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+        );
+      }
     });
   }
 
