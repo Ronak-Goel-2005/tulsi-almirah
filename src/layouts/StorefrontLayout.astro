@@ -11,12 +11,13 @@ interface Props {
   structuredData?: object;
 }
 
+const coverImagePath = '/assets/tulsi-cover.webp';
 const {
   title = 'Steel Almirahs in Shamli | Tulsi Almirah Showroom',
   description = 'Compare steel almirahs, mirrored wardrobes and trunks at Tulsi Almirah in Hind, Shamli. See model photos and sizes, or ask about custom orders and wall fitting.',
   locale = 'en-IN',
   image = {
-    src: '/assets/tulsi-cover.webp',
+    src: coverImagePath,
     alt: locale === 'hi-IN' ? 'शीशे और खुली शेल्फ़ वाली लाल तुलसी अलमारी' : 'Red Tulsi steel almirah with a mirror and open shelves',
     width: 319,
     height: 439,
@@ -47,7 +48,7 @@ const structuredData = pageStructuredData ?? {
       "description": "Steel furniture showroom in Hind, Shamli. Browse powder-coated almirahs, steel trunks, lockers, drawer units, display cabinets and shelving. Custom almirah orders and wall fitting are available.",
       "telephone": showroom.phone,
       "logo": new URL('/assets/tulsi-logo.webp', site).href,
-      "image": shareImage,
+      "image": new URL(coverImagePath, site).href,
       "address": {
         "@type": "PostalAddress",
         "streetAddress": showroom.streetAddress,
@@ -62,6 +63,22 @@ const structuredData = pageStructuredData ?? {
         "longitude": showroom.longitude
       },
       "hasMap": showroom.maps
+    },
+    {
+      "@type": "WebPage",
+      "@id": `${canonical}#page`,
+      "url": canonical,
+      "name": title,
+      "description": description,
+      "inLanguage": locale,
+      "isPartOf": { "@id": `${home}#website` },
+      "mainEntity": { "@id": `${home}#showroom` },
+      "primaryImageOfPage": {
+        "@type": "ImageObject",
+        "contentUrl": shareImage,
+        "width": image.width,
+        "height": image.height
+      }
     }
   ]
 };
@@ -88,7 +105,7 @@ const structuredData = pageStructuredData ?? {
   <meta property="og:image:width" content={String(image.width)}>
   <meta property="og:image:height" content={String(image.height)}>
   <meta property="og:image:alt" content={image.alt}>
-  <meta name="twitter:card" content="summary">
+  <meta name="twitter:card" content={image.width >= 600 && image.width > image.height ? 'summary_large_image' : 'summary'}>
   <link rel="icon" href="/favicon.png" type="image/png" sizes="96x96">
   <link rel="preload" href="/assets/instrument-serif.woff2" as="font" type="font/woff2" crossorigin>
   <script type="application/ld+json" set:html={JSON.stringify(structuredData).replaceAll('<', '\\u003c')}></script>

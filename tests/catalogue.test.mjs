@@ -191,6 +191,12 @@ test('the storefront publishes the hero artwork and progressively enhances card 
   imageSizes.sort(([left], [right]) => left - right);
   assert.ok(imageSizes[0][0] < 600 && imageSizes.at(-1)[0] === 1536);
   assert.ok(imageSizes[0][1] < imageSizes.at(-1)[1] / 2, 'the smallest hero candidate costs substantially less to download');
+  const shareImage = new URL(html.match(/<meta property="og:image" content="([^"]+)">/)[1]);
+  assert.ok(sources.includes(`${shareImage.pathname} 1200w`), 'the homepage shares the published hero image');
+  assert.match(html, /<meta property="og:image:width" content="1200">/);
+  assert.match(html, /<meta property="og:image:height" content="800">/);
+  const graph = JSON.parse(html.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)[1])['@graph'];
+  assert.equal(graph.find((item) => item['@type'] === 'WebPage').primaryImageOfPage.contentUrl, shareImage.href);
   const font = await readFile(new URL('assets/instrument-serif.woff2', publish));
   assert.equal(font.toString('ascii', 0, 4), 'wOF2');
   for (const [, id, , card] of almirahs) {
@@ -283,8 +289,10 @@ test('collection pages list the correct products and link back from each model',
   }
 });
 
-test('the two buying guides have reciprocal language tags and self-canonicals', async () => {
+test('the buying guides stay reachable through collections and their language switch', async () => {
   const home = html.match(/<link rel="canonical" href="([^"]+)">/)[1];
+  const collection = await read('collections/two-door-steel-almirahs/index.html');
+  assert.ok(collection.includes(`href="${guidePaths[0]}"`));
   for (const [index, path] of guidePaths.entries()) {
     const page = await read(`${path.slice(1)}index.html`);
     assert.ok(page.includes(`<html lang="${index === 0 ? 'en-IN' : 'hi-IN'}">`));
@@ -293,7 +301,7 @@ test('the two buying guides have reciprocal language tags and self-canonicals', 
       assert.ok(page.includes(`<link rel="alternate" hreflang="${locale}" href="${new URL(alternate, home)}">`), path);
     }
     assert.ok(page.includes(`href="${guidePaths[1 - index]}"`), path);
-    assert.ok(html.includes(`href="${path}"`), path);
+    assert.ok(!html.includes(`href="${path}"`), `guide link removed from the homepage ${path}`);
   }
 });
 

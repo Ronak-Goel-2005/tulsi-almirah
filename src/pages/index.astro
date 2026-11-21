@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { getImage, Image } from 'astro:assets';
 import heroImage from '../assets/hero-showroom.webp';
 import CollectionLinks from '../components/CollectionLinks.astro';
 import LeafDrift from '../components/LeafDrift.astro';
@@ -10,9 +10,18 @@ import SiteHeader from '../components/SiteHeader.astro';
 import SiteIntro from '../components/SiteIntro.astro';
 import { products } from '../data/products';
 import { showroom } from '../data/showroom';
-import { guidePath } from '../data/steel-almirah-guide';
 import StorefrontLayout from '../layouts/StorefrontLayout.astro';
 import { matchesFilter } from '../lib/catalogue';
+
+const heroFormat = { format: 'webp', quality: 78 } as const;
+const shareWidth = 1200;
+const shareHero = await getImage({ src: heroImage, width: shareWidth, ...heroFormat });
+const shareImage = {
+  src: shareHero.src,
+  alt: 'Illustration of a red steel almirah with a mirror, shelves and a hanging rail',
+  width: shareWidth,
+  height: Math.round(shareWidth * heroImage.height / heroImage.width),
+};
 
 const almirahs = products.filter(({ categories }) => !categories.includes('storage'));
 const trunks = products.filter(({ categories }) => categories.includes('trunk'));
@@ -27,7 +36,7 @@ const filters = [
 ];
 ---
 
-<StorefrontLayout>
+<StorefrontLayout image={shareImage}>
   <SiteIntro />
   <SiteHeader />
 
@@ -48,10 +57,9 @@ const filters = [
         <Image
           class="hero-photo"
           src={heroImage}
-          widths={[480, 800, 1200, heroImage.width]}
+          widths={[480, 800, shareWidth, heroImage.width]}
           sizes="(max-width: 810px) max(100vw, 372px), max(720px, min(72vw, calc(50vw + 350px), 1110px))"
-          format="webp"
-          quality={78}
+          {...heroFormat}
           alt=""
           priority
         />
@@ -88,8 +96,6 @@ const filters = [
       </div>
       <div class="catalogue-page-links">
         <CollectionLinks />
-        <a class="collection-jump" href={guidePath('en')}>Steel almirah buying guide</a>
-        <a class="collection-jump" href={guidePath('hi')} lang="hi-IN">अलमारी खरीदने की गाइड</a>
       </div>
       <div class="filter-bar" hidden>
         <div class="filters flex flex-wrap gap-[.45rem]" role="group" aria-label="Filter almirahs">
