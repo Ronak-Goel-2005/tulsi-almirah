@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 224 280">
+  <style>
+    @media (prefers-reduced-motion: no-preference) {
+      .tulsi-stems {
+        transform-box: view-box;
+        transform-origin: 113px 196px;
+        animation: tulsi-sway 2.2s ease-in-out infinite alternate;
+      }
+    }
+    @keyframes tulsi-sway {
+      from { transform: rotate(-3deg); }
+      to { transform: rotate(4deg); }
+    }
+  </style>
+  <defs>
+    <path id="leaf" d="M0 0C5-9 10-14 17-17l1 2 5-4 1 2 6-4 1 2 6-3 1 2 7-2c-2 4-4 7-7 10l2 1-6 3 1 2-7 2 1 2-8 1 1 2C13 3 6 2 0 0Z"/>
+  </defs>
+  <g class="tulsi-stems" fill="#40583f">
+    <g fill="none" stroke="#40583f" stroke-linecap="round">
+      <path stroke-width="3.5" d="M113 196c1-44-7-75-4-110 2-20 7-34 4-49M111 164c-15-23-35-35-60-43M112 150c16-23 37-40 60-49M109 125c-12-28-29-43-51-55M110 109c13-16 26-28 42-34M113 180c22-12 38-15 56-14"/>
+      <path stroke-width="2" d="M113 43c-2-12-2-25 2-38m36 69c9-11 14-20 16-29"/>
+    </g>
+    <circle cx="114" cy="9" r="2.7"/>
+    <circle cx="108" cy="17" r="2.4"/>
+    <circle cx="117" cy="19" r="2.4"/>
+    <circle cx="108" cy="26" r="2.7"/>
+    <circle cx="117" cy="30" r="2.7"/>
+    <circle cx="166" cy="49" r="2.5"/>
+    <circle cx="160" cy="54" r="2.4"/>
+    <circle cx="168" cy="58" r="2.4"/>
+    <use href="#leaf" transform="translate(113 54) scale(-.66 .66) rotate(8)"/>
+    <use href="#leaf" transform="translate(111 69) scale(.76) rotate(-26)"/>
+    <use href="#leaf" transform="translate(107 87) scale(-.8 .8) rotate(-8)"/>
+    <use href="#leaf" transform="translate(84 89) scale(-.88 .88) rotate(30)"/>
+    <use href="#leaf" transform="translate(60 71) scale(-1 1) rotate(-8)"/>
+    <use href="#leaf" transform="translate(90 98) scale(-.78 .78) rotate(-36)"/>
+    <use href="#leaf" transform="translate(145 81) scale(.76) rotate(23)"/>
+    <use href="#leaf" transform="translate(128 91) scale(.63) rotate(-40)"/>
+    <use href="#leaf" transform="translate(172 101) scale(.9) rotate(-12)"/>
+    <use href="#leaf" transform="translate(155 111) scale(.94) rotate(31)"/>
+    <use href="#leaf" transform="translate(140 122) scale(.79) rotate(-29)"/>
+    <use href="#leaf" transform="translate(75 132) scale(-.93 .93) rotate(17)"/>
+    <use href="#leaf" transform="translate(55 122) scale(-1 1) rotate(1)"/>
+    <use href="#leaf" transform="translate(81 139) scale(-.92 .92) rotate(-33)"/>
+    <use href="#leaf" transform="translate(102 151) scale(-.82 .82) rotate(23)"/>
+    <use href="#leaf" transform="translate(167 166) scale(.93) rotate(9)"/>
+    <use href="#leaf" transform="translate(151 169) scale(.82) rotate(-37)"/>
+    <use href="#leaf" transform="translate(139 175) scale(.8) rotate(42)"/>
+  </g>
+  <g fill="#40583f">
+    <path d="M62 202h101l-13 62c-1 7-6 11-13 11H88c-7 0-12-4-13-11Z"/>
+    <rect x="54" y="190" width="117" height="18" rx="3"/>
+    <rect x="69" y="275" width="87" height="5" rx="2.5"/>
+  </g>
+  <path d="M66 211h93" stroke="#efe7d9" stroke-opacity=".38" stroke-width="2"/>
+</svg>

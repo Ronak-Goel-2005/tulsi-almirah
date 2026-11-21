@@ -1,0 +1,186 @@
+---
+import LeafDrift from '../components/LeafDrift.astro';
+import ModelDialog from '../components/ModelDialog.astro';
+import ProductCard from '../components/ProductCard.astro';
+import SiteIntro from '../components/SiteIntro.astro';
+import { products } from '../data/products';
+import StorefrontLayout from '../layouts/StorefrontLayout.astro';
+import { matchesFilter } from '../lib/catalogue';
+
+const almirahs = products.filter(({ categories }) => !categories.includes('storage'));
+const trunks = products.filter(({ categories }) => categories.includes('trunk'));
+const otherStorage = products.filter(({ categories }) => categories.includes('storage') && !categories.includes('trunk'));
+const filters = [
+  { id: 'all', label: 'All almirahs' },
+  { id: 'two-door', label: 'Two-door' },
+  { id: 'three-door', label: 'Three-door' },
+  { id: 'five-door', label: 'Five-door' },
+  { id: 'mirror', label: 'With mirror' },
+  { id: 'dressing', label: 'Dressing' },
+];
+---
+
+<StorefrontLayout>
+  <SiteIntro />
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner flex items-center justify-between">
+      <a class="brand" href="#" aria-label="Tulsi Almirah home"><img src="assets/tulsi-logo.webp" width="138" height="83" alt="Tulsi Almirah"></a>
+      <nav aria-label="Main navigation">
+        <a href="#services">Services</a>
+        <a href="#collection">Collection</a>
+        <a href="#showroom">Showroom</a>
+      </nav>
+      <a class="button button-green header-call" href="tel:+917017226298">Call the shop</a>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+          <p class="hero-location">Hind, Shamli</p>
+          <h1 id="hero-heading">Steel almirahs<br>made for home.</h1>
+          <p class="hero-description">VNA Industries designs and makes Tulsi almirahs in-house in India, with everyday use in mind. They’re built from new Tata Prime CRC steel sheets shaped by CNC machinery, with roomy interiors, a durable powder-coated finish and branded locks.</p>
+          <div class="actions">
+            <a class="button button-lime hero-cta" href="#collection">Browse the collection</a>
+            <a class="hero-showroom" href="#showroom">Visit the showroom</a>
+          </div>
+        </div>
+      </div>
+      <figure class="hero-stage">
+        <img class="hero-photo" src="assets/hero-showroom.webp" width="1536" height="1024" alt="" fetchpriority="high">
+      </figure>
+    </section>
+
+    <section id="services" class="shop-services" aria-labelledby="services-heading">
+      <div class="wrap services-inner">
+        <div class="services-intro">
+          <h2 id="services-heading">Almirahs and services</h2>
+          <a class="button button-green" href="https://wa.me/917017226298?text=Hi%21%20I%E2%80%99d%20like%20to%20enquire%20about%20Tulsi%20almirahs%2C%20custom%20orders%20and%20wall%20fitting.">Enquire on WhatsApp</a>
+        </div>
+        <div class="services-options">
+          <div class="service-option">
+            <h3>Powder-coated steel almirahs</h3>
+            <p>Choose from two-, three- and five-door almirahs, including mirrored models and full dressing almirahs.</p>
+          </div>
+          <div class="service-option">
+            <h3>Custom orders</h3>
+            <p>Need a custom almirah? Share the available width, depth and height, and tell us what you’d like to store.</p>
+          </div>
+          <div class="service-option">
+            <h3>Wall fitting</h3>
+            <p>Wall fitting is available. Tell us which model you’re considering and where you’d like it fitted.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="collection" class="collection wrap" aria-labelledby="collection-heading">
+      <div class="collection-heading">
+        <h2 id="collection-heading">Find your almirah</h2>
+        <a class="collection-jump" href="#other-storage">Browse trunks and other storage</a>
+      </div>
+      <div class="filter-bar" hidden>
+        <div class="filters flex flex-wrap gap-[.45rem]" role="group" aria-label="Filter almirahs">
+          {filters.map(({ id, label }) => (
+            <button type="button" data-filter={id} aria-pressed={id === 'all' ? 'true' : 'false'}>
+              {label}
+              <span class="filter-count" aria-hidden="true">
+                {almirahs.filter((product) => matchesFilter(product.categories.join(' '), id)).length}
+              </span>
+            </button>
+          ))}
+        </div>
+        <p class="visually-hidden" id="filter-status" role="status"></p>
+      </div>
+      <div class="catalogue">
+        {almirahs.map((product) => <ProductCard product={product} />)}
+      </div>
+    </section>
+
+    <section id="other-storage" class="storage-collection" aria-labelledby="storage-heading">
+      <div class="wrap">
+        <div class="collection-heading">
+          <h2 id="storage-heading">Trunks and other storage</h2>
+          <p>Browse steel trunks, lockers, drawer units, display cabinets and shelving from the Tulsi catalogue.</p>
+        </div>
+        <div class="storage-group">
+          <div class="storage-group-heading">
+            <h3>Steel trunks</h3>
+            <p>Sizes follow the order printed in the catalogue.</p>
+          </div>
+          <div class="catalogue trunk-grid">
+            {trunks.map((product) => <ProductCard product={product} />)}
+          </div>
+        </div>
+        <div class="storage-group">
+          <div class="storage-group-heading">
+            <h3>Lockers, cabinets and shelving</h3>
+            <p>Ask the showroom for sizes, finishes and availability of the designs pictured here.</p>
+          </div>
+          <div class="catalogue">
+            {otherStorage.map((product) => <ProductCard product={product} />)}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="showroom" class="showroom" aria-labelledby="showroom-heading">
+      <div class="wrap showroom-inner">
+        <div class="showroom-copy">
+          <h2 id="showroom-heading">See it in person</h2>
+          <p>See finishes, locks and storage layouts in person. Call ahead to check current prices, availability, fitting and delivery for your chosen product.</p>
+          <div class="actions">
+            <a class="button button-lime" href="https://www.google.com/maps/dir/?api=1&amp;destination=29.5230328%2C77.3778569">Get directions</a>
+            <a class="button button-light-outline" href="tel:+917017226298">Call 70172 26298</a>
+          </div>
+        </div>
+        <div class="showroom-details">
+          <h3>Find us in Hind</h3>
+          <address>G9FH+55, Hind, Shamli<br>Uttar Pradesh 247777</address>
+          <dl class="showroom-hours">
+            <dt>Opening hours</dt>
+            <dd><time datetime="10:00">10 am</time>–<time datetime="18:00">6 pm</time></dd>
+          </dl>
+          <a href="https://www.google.com/maps?cid=12807746779321614385">View on Google Maps</a>
+        </div>
+      </div>
+    </section>
+    <LeafDrift className="storefront-leaves" />
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="#" aria-label="Tulsi Almirah home"><img src="assets/tulsi-logo.webp" width="109" height="66" alt="Tulsi Almirah"></a>
+        <h2>Manufacturer</h2>
+        <address><strong>VNA Industries</strong><br>Khasra No. 911/1, Mahavatpur Road<br>Heend, Shamli, Uttar Pradesh 247777, India</address>
+      </div>
+      <nav aria-labelledby="footer-explore">
+        <h2 id="footer-explore">Explore</h2>
+        <ul class="footer-links">
+          <li><a href="#collection">Browse models and sizes</a></li>
+          <li><a href="#other-storage">Trunks and other storage</a></li>
+          <li><a href="#services">Custom orders &amp; wall fitting</a></li>
+          <li><a href="#showroom">Showroom</a></li>
+        </ul>
+      </nav>
+      <div>
+        <h2>Contact the shop</h2>
+        <ul class="footer-links">
+          <li><a href="tel:+917017226298">+91 70172 26298</a></li>
+          <li><a href="https://wa.me/917017226298">Message on WhatsApp</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Visit us</h2>
+        <address>G9FH+55, Hind, Shamli<br>Uttar Pradesh 247777</address>
+        <p class="footer-hours">Hours <time datetime="10:00">10 am</time>–<time datetime="18:00">6 pm</time></p>
+        <a class="footer-map" href="https://www.google.com/maps/dir/?api=1&amp;destination=29.5230328%2C77.3778569">Get directions</a>
+      </div>
+    </div>
+  </footer>
+
+  <ModelDialog />
+</StorefrontLayout>

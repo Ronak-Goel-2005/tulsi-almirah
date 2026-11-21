@@ -3,6 +3,9 @@ services:
     runtime: static
     name: tulsi-almirah
     branch: main
-    buildCommand: mkdir -p dist && cp -R index.html styles.css catalogue.mjs assets dist/
+    buildCommand: npm ci --include=dev && npm run build
     staticPublishPath: ./dist
     autoDeployTrigger: commit
+    envVars:
+      - key: SKIP_INSTALL_DEPS
+        value: "true"

@@ -3,13 +3,13 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { buildEnquiry, matchesFilter } from '../src/lib/catalogue.ts';
 
 const publish = process.env.SITE_DIR
   ? pathToFileURL(resolve(process.env.SITE_DIR) + '/')
-  : new URL('../', import.meta.url);
+  : new URL('../dist/', import.meta.url);
 const read = (path) => readFile(fileURLToPath(new URL(path, publish)), 'utf8');
 const html = await read('index.html');
-const { buildEnquiry, matchesFilter } = await import(new URL('catalogue.mjs', publish));
 const cards = [...html.matchAll(/<article class="product" id="([^"]+)" data-categories="([^"]+)"[^>]*>([\s\S]*?)<\/article>/g)];
 const almirahs = cards.filter(([, , categories]) => !matchesFilter(categories, 'storage'));
 const storage = cards.filter(([, , categories]) => matchesFilter(categories, 'storage'));
@@ -62,7 +62,8 @@ test('all almirahs use the printed catalogue dimensions, size entries and model 
   assert.equal(almirahs.length, Object.keys(expected).length);
   for (const [article, id, , card] of almirahs) {
     const [width, depth, height, code, suffix] = expected[id];
-    assert.equal(card.match(/<p class="product-size">([^<]+)<\/p>/)?.[1], `${width} × ${depth} × ${height}''`, id);
+    const displayedSize = card.match(/<p class="product-size">([^<]+)<\/p>/)?.[1].replaceAll('&#39;', "'");
+    assert.equal(displayedSize, `${width} × ${depth} × ${height}''`, id);
     assert.equal(article.match(/data-catalogue-code="([^"]+)"/)?.[1], code, id);
     assert.equal(article.match(/data-catalogue-size="([^"]+)"/)?.[1], `${width} × ${depth} × ${height} / ${suffix}`, id);
   }
@@ -154,12 +155,12 @@ test('every product has notes tied to the correct source catalogue page', () => 
   assert.equal(uniqueNotes.size, 20);
 });
 
-test('the intro is a clickable button with only the logo visible', () => {
-  const intro = html.match(/<button class="site-intro" type="button" aria-label="Skip intro" hidden>([\s\S]*?)<\/button>/)?.[1];
-  assert.ok(intro, 'intro markup');
-  assert.equal([...intro.matchAll(/<img\b/g)].length, 1);
+test('the intro keeps its skip control and shows the manufacturing credentials', () => {
+  const intro = html.match(/<button class="site-intro"[^>]*type="button"[^>]*aria-label="Skip intro"[^>]*hidden>([\s\S]*?)<\/button>/)?.[1];
+  assert.ok(intro, 'intro skip button');
   assert.match(intro, /<img class="site-intro-logo" src="assets\/tulsi-logo.webp"/);
-  assert.equal(intro.replace(/<img[^>]*>/g, '').trim(), '');
+  assert.match(intro, /A VNA Industries Product[\s\S]*<span>Made in India<\/span>/);
+  assert.match(intro, /<span>ISO certified company<\/span>/);
 });
 
 test('enquiry includes the full model name and the generic fallback', () => {
@@ -179,12 +180,16 @@ test('the storefront publishes the hero artwork and progressively enhances card 
 });
 
 test('the published files include storefront assets and consistent crawl URLs', async () => {
-  const crawl = process.env.SITE_DIR ? '' : 'dist/';
   const canonical = html.match(/<link rel="canonical" href="([^"]+)">/)[1];
-  assert.ok((await read(`${crawl}robots.txt`)).includes(`Sitemap: ${canonical}sitemap.xml`));
-  assert.ok((await read(`${crawl}sitemap.xml`)).includes(`<loc>${canonical}</loc>`));
-  assert.ok((await read('styles.css')).length > 0);
-  for (const file of ['tulsi-logo.webp', 'tulsi-cover.webp']) {
+  assert.ok((await read('robots.txt')).includes(`Sitemap: ${canonical}sitemap.xml`));
+  assert.ok((await read('sitemap.xml')).includes(`<loc>${canonical}</loc>`));
+  const stylesheet = html.match(/<link rel="stylesheet" href="\/(_astro\/[^"]+\.css)"/)?.[1];
+  const storefront = html.match(/<script type="module" src="\/(_astro\/[^"]+\.js)"/)?.[1];
+  assert.ok(stylesheet, 'a built stylesheet is linked');
+  assert.ok(storefront, 'a built storefront script is linked');
+  assert.ok((await read(stylesheet)).includes('.site-intro'));
+  assert.ok((await read(storefront)).includes('introend'));
+  for (const file of ['tulsi-logo.webp', 'tulsi-cover.webp', 'potted-tulsi.svg']) {
     assert.ok((await readFile(new URL(`assets/${file}`, publish))).length > 0);
   }
 });

@@ -1,0 +1,58 @@
+<dialog id="model-dialog" aria-labelledby="model-title" aria-describedby="model-description">
+  <div class="dialog-header">
+    <h2 id="model-title"></h2>
+    <form method="dialog"><button class="close" aria-label="Close model details" autofocus>&times;</button></form>
+  </div>
+  <p id="model-description"></p>
+  <dl class="model-specs">
+    <div>
+      <dt id="model-size-label">Width × depth × height</dt>
+      <dd id="model-size"></dd>
+    </div>
+    <div>
+      <dt>Catalogue code</dt>
+      <dd id="model-code"></dd>
+    </div>
+  </dl>
+  <details class="model-catalogue-entry">
+    <summary id="model-catalogue-summary">Catalogue notes</summary>
+    <p id="model-catalogue-note"></p>
+    <p id="model-catalogue-size-note" hidden>Printed size <strong id="model-catalogue-size"></strong>. The number after the slash is unlabelled in the brochure.</p>
+  </details>
+  <div class="model-photos">
+    <figure>
+      <div class="model-photo-preview">
+        <img id="model-front" width="350" height="535" alt="">
+        <div class="model-photo-error" hidden>
+          <p>Photo unavailable</p>
+          <button type="button" aria-label="Retry front photo">Retry</button>
+        </div>
+      </div>
+      <figcaption tabindex="-1">Front view</figcaption>
+    </figure>
+    <figure>
+      <div class="model-photo-preview">
+        <img id="model-inside" width="350" height="535" alt="">
+        <div class="model-photo-error" hidden>
+          <p>Photo unavailable</p>
+          <button type="button" aria-label="Retry interior photo">Retry</button>
+        </div>
+      </div>
+      <figcaption tabindex="-1">Inside view</figcaption>
+    </figure>
+    <figure hidden>
+      <div class="model-photo-preview">
+        <img id="model-alternate" width="350" height="535" alt="">
+        <div class="model-photo-error" hidden>
+          <p>Photo unavailable</p>
+          <button type="button" aria-label="Retry additional photo">Retry</button>
+        </div>
+      </div>
+      <figcaption tabindex="-1"></figcaption>
+    </figure>
+  </div>
+  <div class="dialog-actions actions">
+    <a class="button button-green" id="ask-whatsapp" href="https://wa.me/917017226298">Ask on WhatsApp</a>
+    <a class="button button-outline" href="tel:+917017226298">Call</a>
+  </div>
+</dialog>

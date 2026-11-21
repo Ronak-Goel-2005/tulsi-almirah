@@ -18,13 +18,14 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .node-version
+          cache: npm
       - name: Build the Render publish directory
         run: |
           build_command=$(sed -n 's/^    buildCommand: //p' render.yaml)
           test -n "$build_command"
           bash -e -c "$build_command"
+      - name: Type-check the storefront
+        run: npm run check
       - name: Check the published catalogue
-        env:
-          SITE_DIR: dist
         run: node --test

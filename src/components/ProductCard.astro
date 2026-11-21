@@ -1,0 +1,40 @@
+---
+import type { Product } from '../data/products';
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const { name, photo, interiorPhoto, alternatePhoto, dimensions } = product;
+const isStorage = product.categories.includes('storage');
+const Heading = isStorage ? 'h4' : 'h3';
+const size = dimensions?.values.join(' × ');
+const printedSize = dimensions && `${size} / ${dimensions.catalogueSuffix}`;
+const linkLabel = isStorage ? name.charAt(0).toLowerCase() + name.slice(1) : name;
+---
+
+<article
+  class="product"
+  id={product.id}
+  data-categories={product.categories.join(' ')}
+  data-catalogue-code={product.catalogueCode}
+  data-catalogue-size={printedSize}
+  data-alternate-photo={alternatePhoto?.src}
+  data-alternate-caption={alternatePhoto?.caption}
+>
+  <div class="product-image">
+    <img src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} loading="lazy">
+    {interiorPhoto && (
+      <button class="preview-photo" type="button" data-preview-photo aria-pressed="false" hidden>Inside view</button>
+    )}
+  </div>
+  <div class="product-copy">
+    <p class="product-type">{product.type}</p>
+    <Heading>{name}</Heading>
+    {size && <p class="product-size">{isStorage ? size : `${size}''`}</p>}
+    <p class="product-description">{product.description}</p>
+    <template data-catalogue-page={product.cataloguePage}>{product.catalogueNote}</template>
+    <a class="model-button" href={interiorPhoto ?? photo.src} data-view-model>View {linkLabel}</a>
+  </div>
+</article>
