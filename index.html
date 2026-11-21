@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Browse Tulsi Almirah’s two-door, three-door and mirrored steel almirahs. Compare 12 models, request a quote or visit the showroom in Hind, Shamli.">
-  <meta name="theme-color" content="#173c28">
+  <meta name="theme-color" content="#1a2a21">
   <title>Tulsi Almirah | Steel Almirah Showroom in Shamli</title>
   <link rel="canonical" href="https://tulsi-almirah.onrender.com/">
   <meta property="og:type" content="website">
@@ -16,6 +16,7 @@
   <meta property="og:image" content="https://tulsi-almirah.onrender.com/assets/tulsi-cover.webp">
   <meta property="og:image:alt" content="Red Tulsi steel almirah with a mirror and open shelves">
   <link rel="icon" href="assets/tulsi-logo.webp" type="image/webp">
+  <link rel="preload" href="assets/instrument-serif.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <script type="application/ld+json">
     {
@@ -71,7 +72,7 @@
       <a class="brand" href="#" aria-label="Tulsi Almirah home"><img src="assets/tulsi-logo.webp" width="138" height="83" alt="Tulsi Almirah"></a>
       <nav aria-label="Main navigation">
         <a href="#collection">Collection</a>
-        <a href="#showroom">Visit us</a>
+        <a href="#showroom">Showroom</a>
       </nav>
       <a class="button button-green header-call" href="tel:+917017226298">Call the shop</a>
     </div>
@@ -81,17 +82,19 @@
     <section class="hero" aria-labelledby="hero-heading">
       <div class="wrap hero-inner">
         <div class="hero-copy">
-          <h1 id="hero-heading">Steel almirahs<br>for every home.</h1>
-          <p>Explore Tulsi Almirah’s steel collection in Hind, Shamli, from compact two-door models to mirrored dressing almirahs.</p>
+          <p class="hero-location">Hind, Shamli</p>
+          <h1 id="hero-heading">Steel almirahs<br>made for home.</h1>
+          <p class="hero-description">Find a place for everything, from daily essentials to occasion wear. Explore compact two-door models and full mirrored dressing almirahs.</p>
           <div class="actions">
-            <a class="button button-green" href="#collection">Explore the collection</a>
-            <a class="button button-outline" href="#showroom">Visit the showroom</a>
+            <a class="button button-lime hero-cta" href="#collection">Browse the collection</a>
+            <a class="hero-showroom" href="#showroom">Visit the showroom</a>
           </div>
         </div>
-        <figure class="hero-stage">
-          <img class="hero-photo" src="assets/tulsi-cover.webp" width="319" height="439" alt="Red Tulsi steel almirah with a mirror, hanging rail and shelves" fetchpriority="high">
-        </figure>
       </div>
+      <figure class="hero-stage">
+        <img class="hero-photo" src="assets/hero-showroom.webp" width="1536" height="1024" alt="" fetchpriority="high">
+        <figcaption>Illustrated setting</figcaption>
+      </figure>
     </section>
 
     <div class="spec-strip">
@@ -104,10 +107,10 @@
 
     <section id="collection" class="collection wrap" aria-labelledby="collection-heading">
       <div class="collection-heading">
-        <h2 id="collection-heading">Find your almirah</h2>
-        <p>Compare cabinet layouts and take a look inside each model.</p>
+        <h2 id="collection-heading">Find your almirah.</h2>
+        <p>Compare door styles, mirrors and storage layouts. Take a look inside any model as you browse.</p>
       </div>
-      <div class="filter-bar">
+      <div class="filter-bar" hidden>
         <div class="filters" role="group" aria-label="Filter by almirah style">
           <button type="button" data-filter="all" aria-pressed="true">All models</button>
           <button type="button" data-filter="two-door" aria-pressed="false">Two-door</button>
@@ -122,133 +125,145 @@
         <article class="product" id="42-hero" data-categories="two-door">
           <div class="product-image">
             <img src="assets/42-hero.webp" alt="Tulsi 42 Hero almirah, front view" width="350" height="535" loading="lazy">
+            <button class="preview-photo" type="button" data-preview-photo aria-pressed="false" hidden>Inside view</button>
           </div>
           <div class="product-copy">
             <p class="product-type">Two-door</p>
             <h3>42 Hero</h3>
             <p class="product-description">Hanging space and shelves for everyday storage.</p>
-            <button class="model-button" type="button" data-view-model aria-label="View 42 Hero">View model</button>
+            <a class="model-button" href="assets/42-hero-inside.webp" data-view-model>View 42 Hero</a>
           </div>
         </article>
         <article class="product" id="42-hero-mirror" data-categories="two-door mirror">
           <div class="product-image">
             <img src="assets/42-hero-mirror.webp" alt="Tulsi 42 Hero Mirror almirah, front view" width="350" height="535" loading="lazy">
+            <button class="preview-photo" type="button" data-preview-photo aria-pressed="false" hidden>Inside view</button>
           </div>
           <div class="product-copy">
             <p class="product-type">Two-door &middot; Mirror</p>
             <h3>42 Hero Mirror</h3>
             <p class="product-description">Mirror, bangle box and two exterior drawers.</p>
-            <button class="model-button" type="button" data-view-model aria-label="View 42 Hero Mirror">View model</button>
+            <a class="model-button" href="assets/42-hero-mirror-inside.webp" data-view-model>View 42 Hero Mirror</a>
           </div>
         </article>
         <article class="product" id="48-king" data-categories="three-door">
           <div class="product-image">
             <img src="assets/48-king.webp" alt="Tulsi 48 King almirah, front view" width="350" height="535" loading="lazy">
+            <button class="preview-photo" type="button" data-preview-photo aria-pressed="false" hidden>Inside view</button>
           </div>
           <div class="product-copy">
             <p class="product-type">Three-door</p>
             <h3>48 King</h3>
             <p class="product-description">Three doors with an upper storage compartment.</p>
-            <button class="model-button" type="button" data-view-model aria-label="View 48 King">View model</button>
+            <a class="model-button" href="assets/48-king-inside.webp" data-view-model>View 48 King</a>
           </div>
         </article>
         <article class="product" id="36-hero" data-categories="two-door">
           <div class="product-image">
             <img src="assets/36-hero.webp" alt="Tulsi 36 Hero almirah, front view" width="350" height="535" loading="lazy">
+            <button class="preview-photo" type="button" data-preview-photo aria-pressed="false" hidden>Inside view</button>
           </div>
           <div class="product-copy">
             <p class="product-type">Two-door</p>
             <h3>36 Hero</h3>
             <p class="product-description">A compact two-door model with hanging space and shelves.</p>
-            <button class="model-button" type="button" data-view-model aria-label="View 36 Hero">View model</button>
+            <a class="model-button" href="assets/36-hero-inside.webp" data-view-model>View 36 Hero</a>
           </div>
         </article>
         <article class="product" id="36-king" data-categories="two-door">
           <div class="product-image">
             <img src="assets/36-king.webp" alt="Tulsi 36 King almirah, front view" width="350" height="535" loading="lazy">
+            <button class="preview-photo" type="button" data-preview-photo aria-pressed="false" hidden>Inside view</button>
           </div>
           <div class="product-copy">
             <p class="product-type">Two-door</p>
             <h3>36 King</h3>
             <p class="product-description">Two doors with an upper storage compartment.</p>
-            <button class="model-button" type="button" data-view-model aria-label="View 36 King">View model</button>
+            <a class="model-button" href="assets/36-king-inside.webp" data-view-model>View 36 King</a>
           </div>
         </article>
         <article class="product" id="42-king" data-categories="two-door">
           <div class="product-image">
             <img src="assets/42-king.webp" alt="Tulsi 42 King almirah, front view" width="350" height="535" loading="lazy">
+            <button class="preview-photo" type="button" data-preview-photo aria-pressed="false" hidden>Inside view</button>
           </div>
           <div class="product-copy">
             <p class="product-type">Two-door</p>
             <h3>42 King</h3>
             <p class="product-description">Two doors with an upper storage compartment.</p>
-            <button class="model-button" type="button" data-view-model aria-label="View 42 King">View model</button>
+            <a class="model-button" href="assets/42-king-inside.webp" data-view-model>View 42 King</a>
           </div>
         </article>
         <article class="product" id="42-dressing" data-categories="dressing mirror">
           <div class="product-image">
             <img src="assets/42-dressing.webp" alt="Tulsi 42 Dressing almirah, front view" width="350" height="535" loading="lazy">
+            <button class="preview-photo" type="button" data-preview-photo aria-pressed="false" hidden>Inside view</button>
           </div>
           <div class="product-copy">
             <p class="product-type">Dressing &middot; Mirror</p>
             <h3>42 Dressing</h3>
             <p class="product-description">Full dressing almirah with an integrated mirror.</p>
-            <button class="model-button" type="button" data-view-model aria-label="View 42 Dressing">View model</button>
+            <a class="model-button" href="assets/42-dressing-inside.webp" data-view-model>View 42 Dressing</a>
           </div>
         </article>
         <article class="product" id="48-hero" data-categories="three-door">
           <div class="product-image">
             <img src="assets/48-hero.webp" alt="Tulsi 48 Hero almirah, front view" width="350" height="535" loading="lazy">
+            <button class="preview-photo" type="button" data-preview-photo aria-pressed="false" hidden>Inside view</button>
           </div>
           <div class="product-copy">
             <p class="product-type">Three-door</p>
             <h3>48 Hero</h3>
             <p class="product-description">A three-door model with shelving and hanging space.</p>
-            <button class="model-button" type="button" data-view-model aria-label="View 48 Hero">View model</button>
+            <a class="model-button" href="assets/48-hero-inside.webp" data-view-model>View 48 Hero</a>
           </div>
         </article>
         <article class="product" id="48-hero-mirror" data-categories="three-door mirror">
           <div class="product-image">
             <img src="assets/48-hero-mirror.webp" alt="Tulsi 48 Hero Mirror almirah, front view" width="350" height="535" loading="lazy">
+            <button class="preview-photo" type="button" data-preview-photo aria-pressed="false" hidden>Inside view</button>
           </div>
           <div class="product-copy">
             <p class="product-type">Three-door &middot; Mirror</p>
             <h3>48 Hero Mirror</h3>
             <p class="product-description">Mirror, bangle box and two exterior drawers.</p>
-            <button class="model-button" type="button" data-view-model aria-label="View 48 Hero Mirror">View model</button>
+            <a class="model-button" href="assets/48-hero-mirror-inside.webp" data-view-model>View 48 Hero Mirror</a>
           </div>
         </article>
         <article class="product" id="48-king-mirror" data-categories="three-door mirror">
           <div class="product-image">
             <img src="assets/48-king-mirror.webp" alt="Tulsi 48 King Mirror almirah, front view" width="350" height="535" loading="lazy">
+            <button class="preview-photo" type="button" data-preview-photo aria-pressed="false" hidden>Inside view</button>
           </div>
           <div class="product-copy">
             <p class="product-type">Three-door &middot; Mirror</p>
             <h3>48 King Mirror</h3>
             <p class="product-description">Upper storage, two exterior drawers, a mirror and a bangle box.</p>
-            <button class="model-button" type="button" data-view-model aria-label="View 48 King Mirror">View model</button>
+            <a class="model-button" href="assets/48-king-mirror-inside.webp" data-view-model>View 48 King Mirror</a>
           </div>
         </article>
         <article class="product" id="48-classic-five-door" data-categories="five-door">
           <div class="product-image">
             <img src="assets/48-classic-five-door.webp" alt="Tulsi 48 Classic 5 Door almirah, front view" width="350" height="535" loading="lazy">
+            <button class="preview-photo" type="button" data-preview-photo aria-pressed="false" hidden>Inside view</button>
           </div>
           <div class="product-copy">
             <p class="product-type">Five-door</p>
             <h3>48 Classic 5 Door</h3>
             <p class="product-description">Five doors with separately accessible compartments.</p>
-            <button class="model-button" type="button" data-view-model aria-label="View 48 Classic 5 Door">View model</button>
+            <a class="model-button" href="assets/48-classic-five-door-inside.webp" data-view-model>View 48 Classic 5 Door</a>
           </div>
         </article>
         <article class="product" id="48-classic" data-categories="dressing mirror">
           <div class="product-image">
             <img src="assets/48-classic.webp" alt="Tulsi 48 Classic almirah, front view" width="350" height="535" loading="lazy">
+            <button class="preview-photo" type="button" data-preview-photo aria-pressed="false" hidden>Inside view</button>
           </div>
           <div class="product-copy">
             <p class="product-type">Dressing &middot; Mirror</p>
             <h3>48 Classic</h3>
             <p class="product-description">Full dressing almirah with a mirror and exterior drawers.</p>
-            <button class="model-button" type="button" data-view-model aria-label="View 48 Classic">View model</button>
+            <a class="model-button" href="assets/48-classic-inside.webp" data-view-model>View 48 Classic</a>
           </div>
         </article>
       </div>
@@ -257,7 +272,7 @@
     <section id="showroom" class="showroom" aria-labelledby="showroom-heading">
       <div class="wrap showroom-inner">
         <div class="showroom-copy">
-          <h2 id="showroom-heading">Visit Tulsi Almirah</h2>
+          <h2 id="showroom-heading">See it in person.</h2>
           <p>See the finishes and storage layouts in person. Call ahead to ask about stock, prices or delivery.</p>
           <div class="actions">
             <a class="button button-lime" href="https://www.google.com/maps/dir/?api=1&amp;destination=29.5230328%2C77.3778569">Get directions</a>
@@ -287,12 +302,30 @@
     </div>
     <p id="model-description"></p>
     <div class="model-photos">
-      <figure><img id="model-front" width="350" height="535" alt=""><figcaption>Front view</figcaption></figure>
-      <figure><img id="model-inside" width="350" height="535" alt=""><figcaption>Open view</figcaption></figure>
+      <figure>
+        <div class="model-photo-preview">
+          <img id="model-front" width="350" height="535" alt="">
+          <div class="model-photo-error" hidden>
+            <p>Photo unavailable</p>
+            <button type="button" aria-label="Retry front photo">Retry</button>
+          </div>
+        </div>
+        <figcaption tabindex="-1">Front view</figcaption>
+      </figure>
+      <figure>
+        <div class="model-photo-preview">
+          <img id="model-inside" width="350" height="535" alt="">
+          <div class="model-photo-error" hidden>
+            <p>Photo unavailable</p>
+            <button type="button" aria-label="Retry interior photo">Retry</button>
+          </div>
+        </div>
+        <figcaption tabindex="-1">Open view</figcaption>
+      </figure>
     </div>
     <div class="dialog-actions actions">
       <a class="button button-green" id="ask-whatsapp" href="https://wa.me/917017226298">Ask on WhatsApp</a>
-      <a class="button button-outline" href="tel:+917017226298">Call for a quote</a>
+      <a class="button button-outline" href="tel:+917017226298">Call</a>
     </div>
   </dialog>
 </body>

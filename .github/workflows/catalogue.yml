@@ -1,0 +1,30 @@
+name: Catalogue checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  catalogue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build the Render publish directory
+        run: |
+          build_command=$(sed -n 's/^    buildCommand: //p' render.yaml)
+          test -n "$build_command"
+          bash -e -c "$build_command"
+      - name: Check the published catalogue
+        env:
+          SITE_DIR: dist
+        run: node --test
