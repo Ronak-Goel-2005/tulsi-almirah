@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tulsi-almirah.onrender.com/sitemap.xml

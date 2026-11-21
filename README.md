@@ -2,6 +2,8 @@
 
 A responsive storefront for Tulsi Almirah in Hind, Uttar Pradesh.
 
+[Visit the live storefront](https://tulsi-almirah.onrender.com/)
+
 ## Features
 
 - Animated almirah doors frame the opening logo. Click or tap anywhere to enter early, or use the keyboard. The intro is skipped when reduced motion is enabled.
@@ -20,7 +22,7 @@ Open [http://localhost:8000](http://localhost:8000). The site uses HTML, CSS and
 
 ## Hosting
 
-The [Render Blueprint](render.yaml) defines a public Static Site. Render copies the HTML, CSS, JavaScript and product images into its publish directory and redeploys when `main` changes.
+The [Render configuration](render.yaml) serves the HTML, CSS, JavaScript and product images from `dist/`. The checked-in `dist/robots.txt` and `dist/sitemap.xml` are served at the public site root.
 
 ## Catalogue imagery
 
