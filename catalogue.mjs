@@ -7,19 +7,9 @@ export function buildEnquiry(model) {
   return `Hi! I’m interested in ${subject}. Could you share the available sizes, colours, prices and delivery options?`;
 }
 
-function showIntroOnce() {
-  try {
-    if (sessionStorage.getItem('tulsi-intro-seen')) return false;
-    sessionStorage.setItem('tulsi-intro-seen', '1');
-  } catch {
-    // Keep the intro optional when browser storage is unavailable.
-    return false;
-  }
-  return true;
-}
-
 function preparePhoto(image) {
   const figure = image.closest('figure');
+  const caption = figure.querySelector('figcaption');
   const fallback = figure.querySelector('.model-photo-error');
   const retry = fallback.querySelector('button');
   let source;
@@ -37,17 +27,20 @@ function preparePhoto(image) {
   retry.addEventListener('click', () => {
     const url = new URL(source);
     url.searchParams.set('retry', Date.now());
-    figure.querySelector('figcaption').focus({ preventScroll: true });
+    caption.focus({ preventScroll: true });
     load(url);
   });
 
-  return (url, alt) => {
-    source = url;
+  return (url, alt, label) => {
+    figure.hidden = !url;
+    if (!url) return;
+    source = new URL(url, document.baseURI).href;
     image.alt = alt;
-    if (image.src === url && image.complete && image.naturalWidth) return;
+    caption.textContent = label;
+    if (image.src === source && image.complete && image.naturalWidth) return;
     // Remove a previous request so reopening the same failed photo starts fresh.
     image.removeAttribute('src');
-    load(url);
+    load(source);
   };
 }
 
@@ -63,7 +56,7 @@ function enableCardPreview(product) {
     if (button.getAttribute('aria-busy') === 'true') return;
     if (!interior) {
       const photo = new Image();
-      photo.alt = `Tulsi ${model} almirah with doors open`;
+      photo.alt = `Tulsi ${model} almirah, open view`;
       photo.className = 'product-interior';
       photo.setAttribute('aria-hidden', 'true');
       button.setAttribute('aria-busy', 'true');
@@ -93,51 +86,47 @@ function enableCardPreview(product) {
 
 if (typeof document !== 'undefined') {
   const intro = document.querySelector('.site-intro');
-  const skipIntro = intro.querySelector('button');
   const motionPreference = matchMedia('(prefers-reduced-motion: no-preference)');
 
   function finishIntro() {
-    const restoreFocus = document.activeElement === skipIntro;
+    if (intro.hidden) return;
+    const restoreFocus = document.activeElement === intro;
     intro.hidden = true;
+    document.body.classList.remove('has-opening-intro');
     if (restoreFocus) document.querySelector('#main').focus({ preventScroll: true });
+    intro.dispatchEvent(new Event('introend'));
   }
 
-  skipIntro.addEventListener('click', () => {
-    const [fade] = intro.getAnimations();
-    if (fade) {
-      // Advance past the hold while keeping any fade already in progress.
-      fade.currentTime = Math.max(fade.currentTime ?? 0, fade.effect.getTiming().delay);
-    } else {
-      finishIntro();
-    }
-  });
-  skipIntro.addEventListener('focusout', (event) => {
-    if (event.relatedTarget) intro.hidden = true;
-  });
+  intro.addEventListener('click', finishIntro);
   intro.addEventListener('animationend', (event) => {
     if (event.target === intro) finishIntro();
   });
   motionPreference.addEventListener('change', () => {
     if (!motionPreference.matches) finishIntro();
   });
-  skipIntro.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') finishIntro();
+  document.addEventListener('keydown', (event) => {
+    if (intro.hidden || event.key !== 'Escape') return;
+    event.preventDefault();
+    finishIntro();
   });
-  if (motionPreference.matches && !location.hash && !new URLSearchParams(location.search).has('model') && showIntroOnce()) {
+  intro.addEventListener('focusout', (event) => {
+    if (event.relatedTarget) finishIntro();
+  });
+  if (motionPreference.matches) {
     document.body.classList.add('has-opening-intro');
     intro.hidden = false;
   }
 
   const filters = [...document.querySelectorAll('[data-filter]')];
-  const products = [...document.querySelectorAll('[data-categories]')];
-  const catalogue = document.querySelector('.catalogue');
+  const catalogue = document.querySelector('#collection .catalogue');
+  const almirahs = [...catalogue.querySelectorAll('.product')];
   const filterStatus = document.querySelector('#filter-status');
   let filterAnimation;
   for (const filter of filters) {
     const count = document.createElement('span');
     count.className = 'filter-count';
     count.setAttribute('aria-hidden', 'true');
-    count.textContent = products.filter((product) => matchesFilter(product.dataset.categories, filter.dataset.filter)).length;
+    count.textContent = almirahs.filter((product) => matchesFilter(product.dataset.categories, filter.dataset.filter)).length;
     filter.append(count);
     filter.addEventListener('click', () => {
       if (filter.getAttribute('aria-pressed') === 'true') return;
@@ -146,7 +135,7 @@ if (typeof document !== 'undefined') {
         button.setAttribute('aria-pressed', String(button === filter));
       }
       let visible = 0;
-      for (const product of products) {
+      for (const product of almirahs) {
         product.hidden = !matchesFilter(product.dataset.categories, filter.dataset.filter);
         visible += Number(!product.hidden);
       }
@@ -162,19 +151,30 @@ if (typeof document !== 'undefined') {
     });
   }
   document.querySelector('.filter-bar').hidden = false;
-  products.forEach(enableCardPreview);
+  almirahs.forEach(enableCardPreview);
 
   const dialog = document.querySelector('#model-dialog');
   if (typeof dialog.showModal === 'function') {
-    enableModelDetails(dialog, products);
+    enableModelDetails(dialog, document.querySelectorAll('.product'), intro);
   }
 }
 
-function enableModelDetails(dialog, products) {
+function enableModelDetails(dialog, products, intro) {
   const modelTitle = dialog.querySelector('#model-title');
   const modelDescription = dialog.querySelector('#model-description');
+  const specs = dialog.querySelector('.model-specs');
+  const modelSizeLabel = dialog.querySelector('#model-size-label');
+  const modelSize = dialog.querySelector('#model-size');
+  const modelCode = dialog.querySelector('#model-code');
+  const catalogueEntry = dialog.querySelector('.model-catalogue-entry');
+  const catalogueSummary = dialog.querySelector('#model-catalogue-summary');
+  const catalogueNote = dialog.querySelector('#model-catalogue-note');
+  const catalogueSizeNote = dialog.querySelector('#model-catalogue-size-note');
+  const catalogueSize = dialog.querySelector('#model-catalogue-size');
+  const gallery = dialog.querySelector('.model-photos');
   const showFront = preparePhoto(dialog.querySelector('#model-front'));
   const showInside = preparePhoto(dialog.querySelector('#model-inside'));
+  const showAlternate = preparePhoto(dialog.querySelector('#model-alternate'));
   const whatsappLink = dialog.querySelector('#ask-whatsapp');
   const whatsappUrl = new URL(whatsappLink.href);
   const models = new Map();
@@ -182,7 +182,8 @@ function enableModelDetails(dialog, products) {
 
   for (const product of products) {
     const link = product.querySelector('[data-view-model]');
-    models.set(product.id, { product, link, interior: link.href });
+    const interior = product.querySelector('[data-preview-photo]') ? link.href : undefined;
+    models.set(product.id, { product, link, interior });
     const shareUrl = modelUrl(product.id);
     shareUrl.hash = product.id;
     link.href = shareUrl;
@@ -201,6 +202,7 @@ function enableModelDetails(dialog, products) {
   }
 
   function syncModel() {
+    if (!intro.hidden) return;
     const id = new URLSearchParams(location.search).get('model');
     const details = models.get(id);
     if (!details) {
@@ -215,14 +217,34 @@ function enableModelDetails(dialog, products) {
       return;
     }
     const { product, interior } = details;
-    const model = product.querySelector('h3').textContent;
+    const model = product.querySelector('.product-copy :is(h3, h4)').textContent;
     const thumbnail = product.querySelector('img');
+    const notes = product.querySelector('template[data-catalogue-page]');
+    const { catalogueCode: code, catalogueSize: printedSize, alternatePhoto, alternateCaption } = product.dataset;
+    const size = product.querySelector('.product-size')?.textContent;
     activeModel = id;
     modelTitle.textContent = model;
     modelDescription.textContent = product.querySelector('.product-description').textContent;
-    showFront(thumbnail.src, thumbnail.alt);
-    showInside(interior, `Tulsi ${model} almirah with doors open`);
-    whatsappUrl.searchParams.set('text', buildEnquiry(`the Tulsi ${model} almirah`));
+    specs.hidden = !size && !code;
+    modelSize.parentElement.hidden = !size;
+    modelSizeLabel.textContent = interior ? 'Width × depth × height' : 'Dimensions in catalogue order';
+    modelSize.textContent = size ?? '';
+    modelCode.parentElement.hidden = !code;
+    modelCode.textContent = code ?? '';
+    catalogueEntry.open = false;
+    catalogueSummary.textContent = `Catalogue notes · page ${notes.dataset.cataloguePage}`;
+    catalogueNote.textContent = notes.content.textContent.trim();
+    catalogueSizeNote.hidden = !printedSize;
+    catalogueSize.textContent = printedSize ?? '';
+
+    showFront(thumbnail.src, thumbnail.alt, interior ? 'Front view' : 'Catalogue photo');
+    showInside(interior, `Tulsi ${model} almirah, open view`, 'Inside view');
+    showAlternate(alternatePhoto, `Tulsi ${model}: ${alternateCaption}`, alternateCaption);
+    gallery.dataset.photoCount = 1 + Number(Boolean(interior)) + Number(Boolean(alternatePhoto));
+
+    const subject = interior ? `${model} almirah` : model;
+    const reference = code && !subject.endsWith(code) ? ` (catalogue code ${code})` : '';
+    whatsappUrl.searchParams.set('text', buildEnquiry(`the Tulsi ${subject}${reference}`));
     whatsappLink.href = whatsappUrl.href;
     if (!dialog.open) dialog.showModal();
     dialog.scrollTop = 0;
@@ -243,8 +265,14 @@ function enableModelDetails(dialog, products) {
     }
   });
   window.addEventListener('popstate', syncModel);
-  // On shared links, let the browser finish navigating to the card before the dialog takes focus.
-  window.addEventListener('load', () => {
-    if (!dialog.open) requestAnimationFrame(syncModel);
-  }, { once: true });
+
+  function openLinkedModel() {
+    // Finish the opening sequence and the browser's fragment navigation before moving focus.
+    if (!intro.hidden || document.readyState !== 'complete') return;
+    requestAnimationFrame(() => {
+      if (!dialog.open) syncModel();
+    });
+  }
+  window.addEventListener('load', openLinkedModel, { once: true });
+  intro.addEventListener('introend', openLinkedModel, { once: true });
 }

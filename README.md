@@ -6,8 +6,8 @@ A responsive storefront for Tulsi Almirah in Hind, Uttar Pradesh.
 
 ## Features
 
-- Animated almirah doors frame the opening logo once per browser tab session. Click or tap anywhere to enter early, or use the keyboard. The intro is skipped on model links and when reduced motion is enabled.
-- Filter the catalogue of twelve steel almirahs and compare front and interior photos for each model. Copy the URL from an open model to share it. With JavaScript disabled, each model link opens its interior photo.
+- The opening animation shows the Tulsi logo on each page load. Click or tap anywhere, press Enter with the intro focused, or press Escape to skip it. Reduced motion skips the opening sequence.
+- Browse all 20 products from the September 2025 catalogue, including 12 almirahs, two steel trunks and six other storage designs. Product details include source-page notes and front, interior and alternate photos where shown. Copy the URL from an open product to share it. With JavaScript disabled, each product link opens a catalogue photo.
 - Open a model-specific WhatsApp enquiry, call the shop, or get directions to the showroom.
 
 ## Run locally
@@ -28,4 +28,4 @@ The [Render configuration](render.yaml) serves the HTML, CSS, JavaScript and pro
 
 ## Catalogue imagery
 
-Product photos and the logo come from the Tulsi Almirah catalogue. The homepage setting is an ImageGen illustration.
+Product photos, dimensions, model codes and manufacturing details come from the September 2025 Tulsi Almirah catalogue. The homepage setting is an ImageGen illustration.
