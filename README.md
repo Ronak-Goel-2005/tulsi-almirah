@@ -18,6 +18,10 @@ python -m http.server 8000
 
 Open [http://localhost:8000](http://localhost:8000). The site uses HTML, CSS and vanilla JavaScript with no build step.
 
+## Hosting
+
+The [Render Blueprint](render.yaml) defines a public Static Site. Render copies the HTML, CSS, JavaScript and product images into its publish directory and redeploys when `main` changes.
+
 ## Catalogue imagery
 
 Product photos and brand artwork come from the Tulsi Almirah catalogue.
