@@ -1,4 +1,4 @@
-import { buildEnquiry, matchesFilter } from '../lib/catalogue';
+import { matchesFilter, productEnquiry } from '../lib/catalogue';
 
 function preparePhoto(image: HTMLImageElement) {
   const figure = image.closest('figure')!;
@@ -43,7 +43,7 @@ function enableCardPreview(product: HTMLElement) {
   const stage = button.closest('.product-image')!;
   const front = stage.querySelector('img')!;
   const model = product.querySelector('h3')!.textContent ?? '';
-  const interiorUrl = product.querySelector<HTMLAnchorElement>('[data-view-model]')!.href;
+  const interiorUrl = product.dataset.interiorPhoto!;
   let interior: HTMLImageElement | undefined;
 
   button.addEventListener('click', async () => {
@@ -117,7 +117,7 @@ if (motionPreference.matches) {
   storefront.forEach((element) => { element.inert = true; });
   document.body.classList.add('has-opening-intro');
   intro.hidden = false;
-  introTimer = setTimeout(fadeIntro, 4000);
+  introTimer = setTimeout(fadeIntro, 2500);
 }
 
 const filters = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
@@ -173,17 +173,13 @@ function enableModelDetails(dialog: HTMLDialogElement, products: NodeListOf<HTML
   const showInside = preparePhoto(dialog.querySelector<HTMLImageElement>('#model-inside')!);
   const showAlternate = preparePhoto(dialog.querySelector<HTMLImageElement>('#model-alternate')!);
   const whatsappLink = dialog.querySelector<HTMLAnchorElement>('#ask-whatsapp')!;
-  const whatsappUrl = new URL(whatsappLink.href);
-  const models = new Map<string, { product: HTMLElement; link: HTMLAnchorElement; interior?: string }>();
+  const modelPageLink = dialog.querySelector<HTMLAnchorElement>('#model-page-link')!;
+  const models = new Map<string, { product: HTMLElement; link: HTMLAnchorElement }>();
   let activeModel: string | undefined;
 
   for (const product of products) {
     const link = product.querySelector<HTMLAnchorElement>('[data-view-model]')!;
-    const interior = product.querySelector('[data-preview-photo]') ? link.href : undefined;
-    models.set(product.id, { product, link, interior });
-    const shareUrl = modelUrl(product.id);
-    shareUrl.hash = product.id;
-    link.href = shareUrl.href;
+    models.set(product.id, { product, link });
     link.addEventListener('click', (event) => {
       if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
@@ -213,11 +209,11 @@ function enableModelDetails(dialog: HTMLDialogElement, products: NodeListOf<HTML
       }
       return;
     }
-    const { product, interior } = details;
+    const { product, link } = details;
     const model = product.querySelector('.product-copy :is(h3, h4)')!.textContent ?? '';
     const thumbnail = product.querySelector('img')!;
     const notes = product.querySelector<HTMLTemplateElement>('template[data-catalogue-page]')!;
-    const { catalogueCode: code, catalogueSize: printedSize, alternatePhoto, alternateCaption } = product.dataset;
+    const { catalogueCode: code, catalogueSize: printedSize, interiorPhoto: interior, alternatePhoto, alternateCaption } = product.dataset;
     const size = product.querySelector('.product-size')?.textContent;
     activeModel = id;
     modelTitle.textContent = model;
@@ -239,10 +235,8 @@ function enableModelDetails(dialog: HTMLDialogElement, products: NodeListOf<HTML
     showAlternate(alternatePhoto, `Tulsi ${model}: ${alternateCaption}`, alternateCaption ?? '');
     gallery.dataset.photoCount = String(1 + Number(Boolean(interior)) + Number(Boolean(alternatePhoto)));
 
-    const subject = interior ? `${model} almirah` : model;
-    const reference = code && !subject.endsWith(code) ? ` (catalogue code ${code})` : '';
-    whatsappUrl.searchParams.set('text', buildEnquiry(`the Tulsi ${subject}${reference}`));
-    whatsappLink.href = whatsappUrl.href;
+    whatsappLink.href = productEnquiry(model, code, Boolean(interior));
+    modelPageLink.href = link.href;
     if (!dialog.open) dialog.showModal();
     dialog.scrollTop = 0;
   }

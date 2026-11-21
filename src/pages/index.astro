@@ -1,7 +1,11 @@
 ---
+import { Image } from 'astro:assets';
+import heroImage from '../assets/hero-showroom.webp';
 import LeafDrift from '../components/LeafDrift.astro';
 import ModelDialog from '../components/ModelDialog.astro';
 import ProductCard from '../components/ProductCard.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
 import SiteIntro from '../components/SiteIntro.astro';
 import { products } from '../data/products';
 import StorefrontLayout from '../layouts/StorefrontLayout.astro';
@@ -22,18 +26,7 @@ const filters = [
 
 <StorefrontLayout>
   <SiteIntro />
-  <a class="skip" href="#main">Skip to content</a>
-  <header class="site-header">
-    <div class="wrap header-inner flex items-center justify-between">
-      <a class="brand" href="#" aria-label="Tulsi Almirah home"><img src="assets/tulsi-logo.webp" width="138" height="83" alt="Tulsi Almirah"></a>
-      <nav aria-label="Main navigation">
-        <a href="#services">Services</a>
-        <a href="#collection">Collection</a>
-        <a href="#showroom">Showroom</a>
-      </nav>
-      <a class="button button-green header-call" href="tel:+917017226298">Call the shop</a>
-    </div>
-  </header>
+  <SiteHeader />
 
   <main id="main" tabindex="-1">
     <section class="hero" aria-labelledby="hero-heading">
@@ -49,7 +42,16 @@ const filters = [
         </div>
       </div>
       <figure class="hero-stage">
-        <img class="hero-photo" src="assets/hero-showroom.webp" width="1536" height="1024" alt="" fetchpriority="high">
+        <Image
+          class="hero-photo"
+          src={heroImage}
+          widths={[480, 800, 1200, heroImage.width]}
+          sizes="(max-width: 810px) max(100vw, 372px), max(720px, min(72vw, calc(50vw + 350px), 1110px))"
+          format="webp"
+          quality={78}
+          alt=""
+          priority
+        />
       </figure>
     </section>
 
@@ -150,37 +152,11 @@ const filters = [
     <LeafDrift className="storefront-leaves" />
   </main>
 
-  <footer class="site-footer">
-    <div class="wrap footer-inner">
-      <div class="footer-brand">
-        <a class="brand" href="#" aria-label="Tulsi Almirah home"><img src="assets/tulsi-logo.webp" width="109" height="66" alt="Tulsi Almirah"></a>
-        <h2>Manufacturer</h2>
-        <address><strong>VNA Industries</strong><br>Khasra No. 911/1, Mahavatpur Road<br>Heend, Shamli, Uttar Pradesh 247777, India</address>
-      </div>
-      <nav aria-labelledby="footer-explore">
-        <h2 id="footer-explore">Explore</h2>
-        <ul class="footer-links">
-          <li><a href="#collection">Browse models and sizes</a></li>
-          <li><a href="#other-storage">Trunks and other storage</a></li>
-          <li><a href="#services">Custom orders &amp; wall fitting</a></li>
-          <li><a href="#showroom">Showroom</a></li>
-        </ul>
-      </nav>
-      <div>
-        <h2>Contact the shop</h2>
-        <ul class="footer-links">
-          <li><a href="tel:+917017226298">+91 70172 26298</a></li>
-          <li><a href="https://wa.me/917017226298">Message on WhatsApp</a></li>
-        </ul>
-      </div>
-      <div>
-        <h2>Visit us</h2>
-        <address>G9FH+55, Hind, Shamli<br>Uttar Pradesh 247777</address>
-        <p class="footer-hours">Hours <time datetime="10:00">10 am</time>–<time datetime="18:00">6 pm</time></p>
-        <a class="footer-map" href="https://www.google.com/maps/dir/?api=1&amp;destination=29.5230328%2C77.3778569">Get directions</a>
-      </div>
-    </div>
-  </footer>
+  <SiteFooter />
 
   <ModelDialog />
 </StorefrontLayout>
+
+<script>
+  import '../scripts/storefront';
+</script>

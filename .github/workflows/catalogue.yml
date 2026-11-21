@@ -20,11 +20,10 @@ jobs:
         with:
           node-version-file: .node-version
           cache: npm
-      - name: Build the Render publish directory
+      - name: Build the static site
         run: |
-          build_command=$(sed -n 's/^    buildCommand: //p' render.yaml)
-          test -n "$build_command"
-          bash -e -c "$build_command"
+          npm ci --include=dev
+          npm run build
       - name: Type-check the storefront
         run: npm run check
       - name: Check the published catalogue

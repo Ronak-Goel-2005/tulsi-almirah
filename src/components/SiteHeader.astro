@@ -1,0 +1,16 @@
+---
+const home = Astro.url.pathname === '/' ? '' : '/';
+---
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap header-inner flex items-center justify-between">
+    <a class="brand" href={home || "#"} aria-label="Tulsi Almirah home"><img src="/assets/tulsi-logo.webp" width="138" height="83" alt="Tulsi Almirah"></a>
+    <nav aria-label="Main navigation">
+      <a href={`${home}#services`}>Services</a>
+      <a href={`${home}#collection`}>Collection</a>
+      <a href={`${home}#showroom`}>Showroom</a>
+    </nav>
+    <a class="button button-green header-call" href="tel:+917017226298">Call the shop</a>
+  </div>
+</header>

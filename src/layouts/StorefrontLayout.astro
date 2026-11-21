@@ -1,5 +1,58 @@
 ---
 import '../styles/storefront.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: { src: string; alt: string };
+  structuredData?: object;
+}
+
+const {
+  title = 'Tulsi Almirah | Steel Almirah Showroom in Shamli',
+  description = 'Explore Tulsi’s catalogue of steel almirahs, trunks, lockers, cabinets and shelving in Hind, Shamli. View photos, sizes and model codes.',
+  image = { src: '/assets/tulsi-cover.webp', alt: 'Red Tulsi steel almirah with a mirror and open shelves' },
+  structuredData: pageStructuredData,
+} = Astro.props;
+const site = Astro.site!;
+const canonical = new URL(Astro.url.pathname, site).href;
+const shareImage = new URL(image.src, site).href;
+const structuredData = pageStructuredData ?? {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${canonical}#website`,
+      "name": "Tulsi Almirah",
+      "url": canonical,
+      "publisher": { "@id": `${canonical}#showroom` }
+    },
+    {
+      "@type": "FurnitureStore",
+      "@id": `${canonical}#showroom`,
+      "name": "Tulsi Almirah",
+      "url": canonical,
+      "description": "Steel furniture showroom in Hind, Shamli. Browse powder-coated almirahs, steel trunks, lockers, drawer units, display cabinets and shelving. Custom almirah orders and wall fitting are available.",
+      "telephone": "+917017226298",
+      "logo": new URL('/assets/tulsi-logo.webp', site).href,
+      "image": shareImage,
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "G9FH+55",
+        "addressLocality": "Hind",
+        "addressRegion": "Uttar Pradesh",
+        "postalCode": "247777",
+        "addressCountry": "IN"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 29.5230328,
+        "longitude": 77.3778569
+      },
+      "hasMap": "https://www.google.com/maps?cid=12807746779321614385"
+    }
+  ]
+};
 ---
 
 <!doctype html>
@@ -7,63 +60,23 @@ import '../styles/storefront.css';
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Explore Tulsi’s catalogue of steel almirahs, trunks, lockers, cabinets and shelving in Hind, Shamli. View photos, sizes and model codes.">
+  <meta name="description" content={description}>
   <meta name="theme-color" content="#1a2a21">
-  <title>Tulsi Almirah | Steel Almirah Showroom in Shamli</title>
-  <link rel="canonical" href="https://tulsi-almirah.onrender.com/">
+  <title>{title}</title>
+  <link rel="canonical" href={canonical}>
   <meta property="og:type" content="website">
   <meta property="og:locale" content="en_IN">
   <meta property="og:site_name" content="Tulsi Almirah">
-  <meta property="og:title" content="Tulsi Almirah | Steel Almirah Showroom in Shamli">
-  <meta property="og:description" content="Browse the Tulsi catalogue of steel almirahs, trunks and other storage. Visit the showroom in Hind, Shamli.">
-  <meta property="og:url" content="https://tulsi-almirah.onrender.com/">
-  <meta property="og:image" content="https://tulsi-almirah.onrender.com/assets/tulsi-cover.webp">
-  <meta property="og:image:alt" content="Red Tulsi steel almirah with a mirror and open shelves">
-  <link rel="icon" href="assets/tulsi-logo.webp" type="image/webp">
-  <link rel="preload" href="assets/instrument-serif.woff2" as="font" type="font/woff2" crossorigin>
-  <script is:inline type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "WebSite",
-          "@id": "https://tulsi-almirah.onrender.com/#website",
-          "name": "Tulsi Almirah",
-          "url": "https://tulsi-almirah.onrender.com/",
-          "publisher": { "@id": "https://tulsi-almirah.onrender.com/#showroom" }
-        },
-        {
-          "@type": "FurnitureStore",
-          "@id": "https://tulsi-almirah.onrender.com/#showroom",
-          "name": "Tulsi Almirah",
-          "url": "https://tulsi-almirah.onrender.com/",
-          "description": "Steel furniture showroom in Hind, Shamli. Browse powder-coated almirahs, steel trunks, lockers, drawer units, display cabinets and shelving. Custom almirah orders and wall fitting are available.",
-          "telephone": "+917017226298",
-          "logo": "https://tulsi-almirah.onrender.com/assets/tulsi-logo.webp",
-          "image": "https://tulsi-almirah.onrender.com/assets/tulsi-cover.webp",
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "G9FH+55",
-            "addressLocality": "Hind",
-            "addressRegion": "Uttar Pradesh",
-            "postalCode": "247777",
-            "addressCountry": "IN"
-          },
-          "geo": {
-            "@type": "GeoCoordinates",
-            "latitude": 29.5230328,
-            "longitude": 77.3778569
-          },
-          "hasMap": "https://www.google.com/maps?cid=12807746779321614385"
-        }
-      ]
-    }
-  </script>
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content={description}>
+  <meta property="og:url" content={canonical}>
+  <meta property="og:image" content={shareImage}>
+  <meta property="og:image:alt" content={image.alt}>
+  <link rel="icon" href="/assets/tulsi-logo.webp" type="image/webp">
+  <link rel="preload" href="/assets/instrument-serif.woff2" as="font" type="font/woff2" crossorigin>
+  <script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
 </head>
 <body>
   <slot />
-  <script>
-    import '../scripts/storefront';
-  </script>
 </body>
 </html>

@@ -18,6 +18,7 @@ async function checkWebp(path) {
   const image = await readFile(new URL(path, publish));
   assert.equal(image.toString('ascii', 0, 4), 'RIFF', path);
   assert.equal(image.toString('ascii', 8, 12), 'WEBP', path);
+  return image.length;
 }
 
 test('all catalogue filters select the expected number of distinct models', () => {
@@ -29,12 +30,13 @@ test('all catalogue filters select the expected number of distinct models', () =
   }
 });
 
-test('every almirah has two published WebP files and a usable fallback link', async () => {
-  for (const [, id, , card] of almirahs) {
+test('every almirah has two published WebP files and a link to its model page', async () => {
+  for (const [article, id, , card] of almirahs) {
     const title = card.match(/<h3>([^<]+)<\/h3>/)[1];
     const link = card.match(/<a\b([^>]*\bdata-view-model\b[^>]*)>([^<]+)<\/a>/);
     assert.ok(link, `${id} needs a link that works without JavaScript`);
-    assert.ok(link[1].includes(`href="assets/${id}-inside.webp"`), id);
+    assert.ok(link[1].includes(`href="/products/${id}/"`), id);
+    assert.ok(article.includes(`data-interior-photo="assets/${id}-inside.webp"`), id);
     assert.ok(link[2].includes(title), id);
     assert.ok(!link[1].includes('aria-label'), id);
     assert.ok(card.includes(`src="assets/${id}.webp"`), id);
@@ -101,7 +103,7 @@ test('steel trunks and the six other catalogue products have original photos and
     const path = `assets/catalogue/${id}.webp`;
     const [code, sizeEntry] = expected[id];
     assert.ok(card.includes(`src="${path}"`), id);
-    assert.ok(card.includes(`href="${path}" data-view-model`), id);
+    assert.ok(card.includes(`href="/products/${id}/" data-view-model`), id);
     assert.equal(article.match(/data-catalogue-code="([^"]+)"/)?.[1], code, id);
     assert.equal(article.match(/data-catalogue-size="([^"]+)"/)?.[1], sizeEntry, id);
     await checkWebp(path);
@@ -169,9 +171,19 @@ test('enquiry includes the full model name and the generic fallback', () => {
 });
 
 test('the storefront publishes the hero artwork and progressively enhances card previews', async () => {
-  assert.ok(/<img class="hero-photo" src="assets\/hero-showroom\.webp"[^>]*fetchpriority="high">/.test(html), 'hero artwork is loaded with high priority');
-  const hero = await readFile(new URL('assets/hero-showroom.webp', publish));
-  assert.equal(hero.toString('ascii', 8, 12), 'WEBP');
+  const hero = html.match(/<img\b[^>]*\bclass="hero-photo"[^>]*>/)?.[0] ?? '';
+  assert.match(hero, /fetchpriority="high"/);
+  const sources = hero.match(/srcset="([^"]+)"/)?.[1].split(/,\s*/) ?? [];
+  assert.ok(sources.length >= 3, 'the browser can choose a hero image suited to its viewport');
+  const imageSizes = [];
+  for (const source of sources) {
+    const [path, width] = source.split(' ');
+    const relativePath = path.replace(/^\//, '');
+    imageSizes.push([parseInt(width, 10), await checkWebp(relativePath)]);
+  }
+  imageSizes.sort(([left], [right]) => left - right);
+  assert.ok(imageSizes[0][0] < 600 && imageSizes.at(-1)[0] === 1536);
+  assert.ok(imageSizes[0][1] < imageSizes.at(-1)[1] / 2, 'the smallest hero candidate costs substantially less to download');
   const font = await readFile(new URL('assets/instrument-serif.woff2', publish));
   assert.equal(font.toString('ascii', 0, 4), 'wOF2');
   for (const [, id, , card] of almirahs) {
@@ -181,6 +193,13 @@ test('the storefront publishes the hero artwork and progressively enhances card 
 
 test('the published files include storefront assets and consistent crawl URLs', async () => {
   const canonical = html.match(/<link rel="canonical" href="([^"]+)">/)[1];
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    assert.equal(canonical, `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}/`);
+  }
+  assert.ok(html.includes(`<meta property="og:url" content="${canonical}">`));
+  const store = JSON.parse(html.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)[1])['@graph'][1];
+  assert.equal(store.url, canonical);
+  assert.equal(store.logo, `${canonical}assets/tulsi-logo.webp`);
   assert.ok((await read('robots.txt')).includes(`Sitemap: ${canonical}sitemap.xml`));
   assert.ok((await read('sitemap.xml')).includes(`<loc>${canonical}</loc>`));
   const stylesheet = html.match(/<link rel="stylesheet" href="\/(_astro\/[^"]+\.css)"/)?.[1];
@@ -192,4 +211,31 @@ test('the published files include storefront assets and consistent crawl URLs', 
   for (const file of ['tulsi-logo.webp', 'tulsi-cover.webp', 'potted-tulsi.svg']) {
     assert.ok((await readFile(new URL(`assets/${file}`, publish))).length > 0);
   }
+});
+
+test('every model has a canonical page with unique metadata and a sitemap entry', async () => {
+  const home = html.match(/<link rel="canonical" href="([^"]+)">/)[1];
+  const sitemap = await read('sitemap.xml');
+  const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, url]) => url);
+  const expected = [home, ...cards.map(([, id]) => `${home}products/${id}/`)];
+  assert.deepEqual(locations.slice().sort(), expected.sort());
+
+  const titles = new Set();
+  const descriptions = new Set();
+  for (const [, id, , card] of cards) {
+    const canonical = `${home}products/${id}/`;
+    const page = await read(`products/${id}/index.html`);
+    const name = card.match(/<h[34]>([^<]+)<\/h[34]>/)[1];
+    assert.ok(page.includes(`<link rel="canonical" href="${canonical}">`), id);
+    assert.ok(page.includes(`<meta property="og:url" content="${canonical}">`), id);
+    assert.ok(page.match(/<h1[^>]*>([^<]+)<\/h1>/)?.[1].includes(name), id);
+    assert.match(page, /<nav[^>]+aria-label="Breadcrumb"/);
+    const data = JSON.parse(page.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)[1]);
+    const breadcrumb = data['@graph'].find((entry) => entry['@type'] === 'BreadcrumbList');
+    assert.equal(breadcrumb.itemListElement.at(-1).item, canonical);
+    titles.add(page.match(/<title>([^<]+)<\/title>/)?.[1]);
+    descriptions.add(page.match(/<meta name="description" content="([^"]+)">/)?.[1]);
+  }
+  assert.ok(!titles.has(undefined) && titles.size === cards.length);
+  assert.ok(!descriptions.has(undefined) && descriptions.size === cards.length);
 });

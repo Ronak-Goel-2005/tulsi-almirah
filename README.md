@@ -2,12 +2,12 @@
 
 A responsive storefront for Tulsi Almirah in Hind, Uttar Pradesh.
 
-[Visit the live storefront](https://tulsi-almirah.onrender.com/)
+[Visit the live storefront](https://tulsi-almirah.vercel.app/)
 
 ## Features
 
 - The opening animation shows the Tulsi logo, swaying tulsi plant, and manufacturing credentials. Click or tap anywhere, press Enter with the intro focused, or press Escape to skip it. Reduced motion skips the opening sequence.
-- Browse all 20 products from the September 2025 catalogue, including 12 almirahs, two steel trunks and six other storage designs. Product details include source-page notes and front, interior and alternate photos where shown. Copy the URL from an open product to share it. With JavaScript disabled, each product link opens a catalogue photo.
+- Browse all 20 products from the September 2025 catalogue, including 12 almirahs, two steel trunks and six other storage designs. Product details include source-page notes and front, interior and alternate photos where shown. Each model has a shareable product page and can be opened from the catalogue without JavaScript.
 - Open a model-specific WhatsApp enquiry, call the shop, or get directions to the showroom.
 
 ## Run locally
@@ -27,7 +27,7 @@ Run `npm run check` to type-check the project and `npm test` to build and check 
 
 ## Hosting
 
-The [Render configuration](render.yaml) builds the site and publishes `dist/`. Astro copies the photos, `robots.txt`, and `sitemap.xml` from `public/`. GitHub Actions runs the same build before checking the generated site.
+The site builds to `dist/`. Astro copies the photos from `public/` and generates `robots.txt` and `sitemap.xml` from the configured site URL. Vercel builds use the project's production domain for those files and the page metadata. GitHub Actions checks the generated site.
 
 ## Catalogue imagery
 

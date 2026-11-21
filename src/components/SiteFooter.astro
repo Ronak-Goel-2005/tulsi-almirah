@@ -1,0 +1,35 @@
+---
+const home = Astro.url.pathname === '/' ? '' : '/';
+---
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <a class="brand" href={home || "#"} aria-label="Tulsi Almirah home"><img src="/assets/tulsi-logo.webp" width="109" height="66" alt="Tulsi Almirah"></a>
+      <h2>Manufacturer</h2>
+      <address><strong>VNA Industries</strong><br>Khasra No. 911/1, Mahavatpur Road<br>Heend, Shamli, Uttar Pradesh 247777, India</address>
+    </div>
+    <nav aria-labelledby="footer-explore">
+      <h2 id="footer-explore">Explore</h2>
+      <ul class="footer-links">
+        <li><a href={`${home}#collection`}>Browse models and sizes</a></li>
+        <li><a href={`${home}#other-storage`}>Trunks and other storage</a></li>
+        <li><a href={`${home}#services`}>Custom orders &amp; wall fitting</a></li>
+        <li><a href={`${home}#showroom`}>Showroom</a></li>
+      </ul>
+    </nav>
+    <div>
+      <h2>Contact the shop</h2>
+      <ul class="footer-links">
+        <li><a href="tel:+917017226298">+91 70172 26298</a></li>
+        <li><a href="https://wa.me/917017226298">Message on WhatsApp</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Visit us</h2>
+      <address>G9FH+55, Hind, Shamli<br>Uttar Pradesh 247777</address>
+      <p class="footer-hours">Hours <time datetime="10:00">10 am</time>–<time datetime="18:00">6 pm</time></p>
+      <a class="footer-map" href="https://www.google.com/maps/dir/?api=1&amp;destination=29.5230328%2C77.3778569">Get directions</a>
+    </div>
+  </div>
+</footer>

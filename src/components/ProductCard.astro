@@ -1,5 +1,6 @@
 ---
 import type { Product } from '../data/products';
+import { productPath } from '../lib/catalogue';
 
 interface Props {
   product: Product;
@@ -20,6 +21,7 @@ const linkLabel = isStorage ? name.charAt(0).toLowerCase() + name.slice(1) : nam
   data-categories={product.categories.join(' ')}
   data-catalogue-code={product.catalogueCode}
   data-catalogue-size={printedSize}
+  data-interior-photo={interiorPhoto}
   data-alternate-photo={alternatePhoto?.src}
   data-alternate-caption={alternatePhoto?.caption}
 >
@@ -35,6 +37,6 @@ const linkLabel = isStorage ? name.charAt(0).toLowerCase() + name.slice(1) : nam
     {size && <p class="product-size">{isStorage ? size : `${size}''`}</p>}
     <p class="product-description">{product.description}</p>
     <template data-catalogue-page={product.cataloguePage}>{product.catalogueNote}</template>
-    <a class="model-button" href={interiorPhoto ?? photo.src} data-view-model>View {linkLabel}</a>
+    <a class="model-button" href={productPath(product.id)} data-view-model>View {linkLabel}</a>
   </div>
 </article>
