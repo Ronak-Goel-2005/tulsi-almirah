@@ -1,14 +1,19 @@
 # Tulsi Almirah
 
-A responsive storefront for Tulsi Almirah in Hind, Uttar Pradesh.
+Tulsi Almirah is a steel furniture showroom in Hind, Shamli, Uttar Pradesh. This storefront showcases the VNA Industries catalogue and helps customers compare models before contacting the shop.
 
-[Visit the live storefront](https://tulsi-almirah.vercel.app/)
+[Live storefront](https://tulsi-almirah.vercel.app/) · [Browse the catalogue](https://tulsi-almirah.vercel.app/#collection) · [Sitemap](https://tulsi-almirah.vercel.app/sitemap.xml)
 
-## Features
+## Catalogue and storefront
 
-- The opening animation shows the Tulsi logo, swaying tulsi plant, and manufacturing credentials. Click or tap anywhere, press Enter with the intro focused, or press Escape to skip it. Reduced motion skips the opening sequence.
-- Browse all 20 products from the September 2025 catalogue, including 12 almirahs, two steel trunks and six other storage designs. Product details include source-page notes and front, interior and alternate photos where shown. Each model has a shareable product page and can be opened from the catalogue without JavaScript.
-- Open a model-specific WhatsApp enquiry, call the shop, or get directions to the showroom.
+- Filter 12 almirah models by door count, mirrors, or dressing layout. The catalogue also includes two steel trunks and six other storage designs.
+- Open a quick view or a shareable product page with available photos, dimensions, model codes, and notes from the September 2025 catalogue. Product pages work without JavaScript.
+- Send a model-specific WhatsApp enquiry, call the shop, or get directions to the showroom.
+- Skip the opening animation by clicking, tapping, or pressing Escape. The intro and decorative leaf animations respect reduced-motion preferences.
+
+## Stack
+
+Astro generates the static pages and responsive hero images. TypeScript handles the catalogue interactions, and Tailwind CSS and custom CSS handle the layout and animations.
 
 ## Run locally
 
@@ -19,15 +24,22 @@ npm ci
 npm run dev
 ```
 
-Open [http://localhost:4321](http://localhost:4321). Astro generates static HTML. Tailwind CSS handles shared layouts, and the storefront stylesheet defines the custom animations and visual details. TypeScript handles browser interactions.
+Open [the development server](http://localhost:4321/).
 
-Edit products in [src/data/products.ts](src/data/products.ts) and place their photos in [public/assets](public/assets). The shared product-card template uses this data to render the catalogue.
+| Command | Purpose |
+| --- | --- |
+| `npm run check` | Type-check the Astro and TypeScript code |
+| `npm test` | Build and test the catalogue, product pages, and crawl files |
+| `npm run build` | Generate the static site in `dist/` |
+| `npm run preview` | Serve the latest production build locally |
 
-Run `npm run check` to type-check the project and `npm test` to build and check the published catalogue. Run `npm run preview` to open the production build locally.
+## Catalogue updates
 
-## Hosting
+Edit models in [src/data/products.ts](src/data/products.ts) and place model photos in [public/assets](public/assets). The same catalogue data drives the storefront cards, individual product pages, and sitemap.
 
-The site builds to `dist/`. Astro copies the photos from `public/` and generates `robots.txt` and `sitemap.xml` from the configured site URL. Vercel builds use the project's production domain for those files and the page metadata. GitHub Actions checks the generated site.
+## Deployment
+
+Vercel serves the static build. Astro uses the production domain for canonical links, social previews, `robots.txt`, and `sitemap.xml`. GitHub Actions builds, type-checks, and tests the site on pull requests and pushes to `main`.
 
 ## Catalogue imagery
 
