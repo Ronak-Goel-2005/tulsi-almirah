@@ -1,0 +1,17 @@
+---
+import { collections, collectionPath } from '../data/collections';
+
+interface Props {
+  current?: string;
+}
+
+const { current } = Astro.props;
+---
+
+<nav aria-label="Catalogue categories">
+  <ul class="collection-links">
+    {collections.filter(({ id }) => id !== current).map(({ id, label }) => (
+      <li><a class="collection-jump" href={collectionPath(id)}>{label}</a></li>
+    ))}
+  </ul>
+</nav>

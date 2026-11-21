@@ -1,0 +1,80 @@
+---
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CollectionLinks from '../../components/CollectionLinks.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import { collections, collectionPath } from '../../data/collections';
+import { guidePath } from '../../data/steel-almirah-guide';
+import { products } from '../../data/products';
+import StorefrontLayout from '../../layouts/StorefrontLayout.astro';
+import { breadcrumbSchema } from '../../lib/breadcrumbs';
+import { productPath } from '../../lib/catalogue';
+
+export function getStaticPaths() {
+  return collections.map((collection) => ({ params: { id: collection.id }, props: { collection } }));
+}
+
+interface Props {
+  collection: (typeof collections)[number];
+}
+
+const { collection } = Astro.props;
+const { id, name, description, detail } = collection;
+const site = Astro.site!;
+const path = collectionPath(id);
+const canonical = new URL(path, site).href;
+const breadcrumbs = [{ name: 'Home', path: '/' }, { name, path }];
+const models = products.filter(({ categories }) => categories.includes(collection.category));
+const photo = models[0].photo;
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'CollectionPage',
+      '@id': `${canonical}#page`,
+      url: canonical,
+      name,
+      description,
+      isPartOf: { '@id': new URL('/#website', site).href },
+      mainEntity: { '@id': `${canonical}#models` },
+      breadcrumb: breadcrumbSchema(breadcrumbs, site),
+    },
+    {
+      '@type': 'ItemList',
+      '@id': `${canonical}#models`,
+      itemListElement: models.map((product, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: product.name,
+        url: new URL(productPath(product.id), site).href,
+      })),
+    },
+  ],
+};
+---
+
+<StorefrontLayout title={`${name} in Shamli | Tulsi Almirah`} {description} image={{ ...photo, src: `/${photo.src}` }} {structuredData}>
+  <SiteHeader />
+  <main id="main" class="catalogue-page wrap" tabindex="-1">
+    <Breadcrumbs items={breadcrumbs} />
+    <header class="catalogue-page-intro">
+      <h1>{name}</h1>
+      <p>{detail}</p>
+      <p><a href="/#showroom">Visit the showroom in Hind, Shamli</a> to ask about prices and availability.</p>
+    </header>
+
+    <section class="catalogue-page-models" aria-labelledby="models-heading">
+      <h2 id="models-heading">Compare models</h2>
+      <div class="catalogue">
+        {models.map((product) => <ProductCard product={product} heading="h3" />)}
+      </div>
+    </section>
+
+    <div class="catalogue-page-links">
+      <CollectionLinks current={id} />
+      <a class="collection-jump" href={guidePath('en')}>Steel almirah buying guide</a>
+    </div>
+  </main>
+  <SiteFooter />
+</StorefrontLayout>

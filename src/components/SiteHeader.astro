@@ -1,16 +1,23 @@
 ---
+import { showroom } from '../data/showroom';
+
+interface Props {
+  hindi?: boolean;
+}
+
+const { hindi = false } = Astro.props;
 const home = Astro.url.pathname === '/' ? '' : '/';
 ---
 
-<a class="skip" href="#main">Skip to content</a>
+<a class="skip" href="#main">{hindi ? 'मुख्य सामग्री पर जाएँ' : 'Skip to content'}</a>
 <header class="site-header">
   <div class="wrap header-inner flex items-center justify-between">
-    <a class="brand" href={home || "#"} aria-label="Tulsi Almirah home"><img src="/assets/tulsi-logo.webp" width="138" height="83" alt="Tulsi Almirah"></a>
-    <nav aria-label="Main navigation">
-      <a href={`${home}#services`}>Services</a>
-      <a href={`${home}#collection`}>Collection</a>
-      <a href={`${home}#showroom`}>Showroom</a>
+    <a class="brand" href="/" aria-label={hindi ? 'तुलसी अलमारी का मुखपृष्ठ' : 'Tulsi Almirah home'}><img src="/assets/tulsi-logo.webp" width="138" height="83" alt={hindi ? 'तुलसी अलमारी' : showroom.name}></a>
+    <nav aria-label={hindi ? 'मुख्य मेन्यू' : 'Main navigation'}>
+      <a href={`${home}#services`}>{hindi ? 'सेवाएँ' : 'Services'}</a>
+      <a href={`${home}#collection`}>{hindi ? 'मॉडल' : 'Collection'}</a>
+      <a href={`${home}#showroom`}>{hindi ? 'शोरूम' : 'Showroom'}</a>
     </nav>
-    <a class="button button-green header-call" href="tel:+917017226298">Call the shop</a>
+    <a class="button button-green header-call" href={`tel:${showroom.phone}`}>{hindi ? 'फ़ोन करें' : 'Call the shop'}</a>
   </div>
 </header>

@@ -1,0 +1,74 @@
+---
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import SiteFooter from '../../../components/SiteFooter.astro';
+import SiteHeader from '../../../components/SiteHeader.astro';
+import { showroom } from '../../../data/showroom';
+import { guides, guidePath, type GuideLanguage } from '../../../data/steel-almirah-guide';
+import StorefrontLayout from '../../../layouts/StorefrontLayout.astro';
+import { breadcrumbSchema } from '../../../lib/breadcrumbs';
+
+export function getStaticPaths() {
+  return (Object.keys(guides) as GuideLanguage[]).map((language) => ({ params: { language }, props: { language } }));
+}
+
+interface Props {
+  language: GuideLanguage;
+}
+
+const { language } = Astro.props;
+const { locale, title, heading, description, intro, sections } = guides[language];
+const hindi = language === 'hi';
+const site = Astro.site!;
+const path = guidePath(language);
+const canonical = new URL(path, site).href;
+const breadcrumbs = [{ name: hindi ? 'मुखपृष्ठ' : 'Home', path: '/' }, { name: heading, path }];
+const alternates = [
+  { locale: 'en-IN', path: guidePath('en') },
+  { locale: 'hi-IN', path: guidePath('hi') },
+  { locale: 'x-default', path: guidePath('en') },
+];
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  '@id': `${canonical}#page`,
+  url: canonical,
+  name: heading,
+  description,
+  inLanguage: locale,
+  isPartOf: { '@id': new URL('/#website', site).href },
+  publisher: { '@id': new URL('/#showroom', site).href },
+  breadcrumb: breadcrumbSchema(breadcrumbs, site),
+};
+---
+
+<StorefrontLayout {title} {description} {locale} {alternates} {structuredData}>
+  <SiteHeader {hindi} />
+  <main id="main" class="catalogue-page wrap" tabindex="-1">
+    <Breadcrumbs items={breadcrumbs} label={hindi ? 'पेज का रास्ता' : 'Breadcrumb'} />
+    <article class="buying-guide">
+      <header class="catalogue-page-intro">
+        <a class="collection-jump" href={guidePath(hindi ? 'en' : 'hi')} lang={hindi ? 'en-IN' : 'hi-IN'}>
+          {hindi ? 'Read in English' : 'हिंदी में पढ़ें'}
+        </a>
+        <h1>{heading}</h1>
+        <p>{intro}</p>
+      </header>
+      {sections.map(({ heading: sectionHeading, copy, links }) => (
+        <section>
+          <h2>{sectionHeading}</h2>
+          <p>{copy}</p>
+          {links && (
+            <ul class="collection-links">
+              {links.map(({ label, href }) => <li><a class="collection-jump" href={href}>{label}</a></li>)}
+            </ul>
+          )}
+        </section>
+      ))}
+      <div class="actions">
+        <a class="button button-green" href={showroom.whatsapp}>{hindi ? 'WhatsApp पर पूछें' : 'Ask on WhatsApp'}</a>
+        <a class="button button-outline" href={showroom.directions}>{hindi ? 'शोरूम का रास्ता देखें' : 'Get directions to the showroom'}</a>
+      </div>
+    </article>
+  </main>
+  <SiteFooter {hindi} />
+</StorefrontLayout>

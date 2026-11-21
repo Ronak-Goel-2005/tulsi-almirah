@@ -1,3 +1,5 @@
+import { showroom } from '../data/showroom.ts';
+
 export function matchesFilter(categories: string, filter: string): boolean {
   return filter === 'all' || categories.split(' ').includes(filter);
 }
@@ -14,7 +16,7 @@ export function productPath(id: string): string {
 export function productEnquiry(model: string, catalogueCode: string | undefined, isAlmirah: boolean): string {
   const subject = isAlmirah ? `${model} almirah` : model;
   const reference = catalogueCode && !subject.endsWith(catalogueCode) ? ` (catalogue code ${catalogueCode})` : '';
-  const url = new URL('https://wa.me/917017226298');
+  const url = new URL(showroom.whatsapp);
   url.searchParams.set('text', buildEnquiry(`the Tulsi ${subject}${reference}`));
   return url.href;
 }

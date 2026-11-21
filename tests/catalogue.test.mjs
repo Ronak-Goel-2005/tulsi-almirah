@@ -13,6 +13,13 @@ const html = await read('index.html');
 const cards = [...html.matchAll(/<article class="product" id="([^"]+)" data-categories="([^"]+)"[^>]*>([\s\S]*?)<\/article>/g)];
 const almirahs = cards.filter(([, , categories]) => !matchesFilter(categories, 'storage'));
 const storage = cards.filter(([, , categories]) => matchesFilter(categories, 'storage'));
+const collections = {
+  'two-door-steel-almirahs': 'two-door',
+  'three-door-steel-almirahs': 'three-door',
+  'mirrored-steel-almirahs': 'mirror',
+  'steel-trunks-and-storage': 'storage',
+};
+const guidePaths = ['/guides/steel-almirah/en/', '/guides/steel-almirah/hi/'];
 
 async function checkWebp(path) {
   const image = await readFile(new URL(path, publish));
@@ -36,10 +43,10 @@ test('every almirah has two published WebP files and a link to its model page', 
     const link = card.match(/<a\b([^>]*\bdata-view-model\b[^>]*)>([^<]+)<\/a>/);
     assert.ok(link, `${id} needs a link that works without JavaScript`);
     assert.ok(link[1].includes(`href="/products/${id}/"`), id);
-    assert.ok(article.includes(`data-interior-photo="assets/${id}-inside.webp"`), id);
+    assert.ok(article.includes(`data-interior-photo="/assets/${id}-inside.webp"`), id);
     assert.ok(link[2].includes(title), id);
     assert.ok(!link[1].includes('aria-label'), id);
-    assert.ok(card.includes(`src="assets/${id}.webp"`), id);
+    assert.ok(card.includes(`src="/assets/${id}.webp"`), id);
     for (const file of [`${id}.webp`, `${id}-inside.webp`]) {
       await checkWebp(`assets/${file}`);
     }
@@ -80,9 +87,9 @@ test('the eight additional almirah photos from the catalogue are published', asy
   assert.deepEqual(alternate.map(([, id]) => id).sort(), expected);
   for (const [article, id] of alternate) {
     const path = article.match(/data-alternate-photo="([^"]+)"/)[1];
-    assert.equal(path, `assets/catalogue/${id}-alternate.webp`);
+    assert.equal(path, `/assets/catalogue/${id}-alternate.webp`);
     assert.ok(article.includes('data-alternate-caption='), id);
-    await checkWebp(path);
+    await checkWebp(path.slice(1));
   }
 });
 
@@ -102,7 +109,7 @@ test('steel trunks and the six other catalogue products have original photos and
   for (const [article, id, , card] of storage) {
     const path = `assets/catalogue/${id}.webp`;
     const [code, sizeEntry] = expected[id];
-    assert.ok(card.includes(`src="${path}"`), id);
+    assert.ok(card.includes(`src="/${path}"`), id);
     assert.ok(card.includes(`href="/products/${id}/" data-view-model`), id);
     assert.equal(article.match(/data-catalogue-code="([^"]+)"/)?.[1], code, id);
     assert.equal(article.match(/data-catalogue-size="([^"]+)"/)?.[1], sizeEntry, id);
@@ -217,8 +224,14 @@ test('every model has a canonical page with unique metadata and a sitemap entry'
   const home = html.match(/<link rel="canonical" href="([^"]+)">/)[1];
   const sitemap = await read('sitemap.xml');
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, url]) => url);
-  const expected = [home, ...cards.map(([, id]) => `${home}products/${id}/`)];
+  const expected = [home, ...cards.map(([, id]) => `${home}products/${id}/`),
+    ...Object.keys(collections).map((id) => `${home}collections/${id}/`),
+    ...guidePaths.map((path) => new URL(path, home).href)];
   assert.deepEqual(locations.slice().sort(), expected.sort());
+  assert.match(sitemap, /xmlns:image="http:\/\/www\.google\.com\/schemas\/sitemap-image\/1\.1"/);
+  const sitemapEntries = new Map([...sitemap.matchAll(/<url>\s*<loc>([^<]+)<\/loc>([\s\S]*?)<\/url>/g)]
+    .map(([, url, entry]) => [url, entry]));
+  assert.match(html, /<meta name="robots" content="max-image-preview:large">/);
 
   const titles = new Set();
   const descriptions = new Set();
@@ -233,9 +246,66 @@ test('every model has a canonical page with unique metadata and a sitemap entry'
     const data = JSON.parse(page.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)[1]);
     const breadcrumb = data['@graph'].find((entry) => entry['@type'] === 'BreadcrumbList');
     assert.equal(breadcrumb.itemListElement.at(-1).item, canonical);
+    const gallery = page.match(/<div class="product-detail-photos">([\s\S]*?)<\/div>/)[1];
+    const galleryImages = [...gallery.matchAll(/<img\s+src="([^"]+)"/g)].map(([, src]) => new URL(src, home).href);
+    const imageUrls = [...sitemapEntries.get(canonical).matchAll(/<image:loc>([^<]+)<\/image:loc>/g)].map(([, url]) => url);
+    assert.deepEqual(imageUrls, galleryImages, id);
+    for (const image of imageUrls) await checkWebp(new URL(image).pathname.slice(1));
+    const itemPage = data['@graph'].find((entry) => entry['@type'] === 'ItemPage');
+    assert.equal(itemPage.primaryImageOfPage.contentUrl, galleryImages[0], id);
+    assert.match(page, /<meta name="robots" content="max-image-preview:large">/, id);
     titles.add(page.match(/<title>([^<]+)<\/title>/)?.[1]);
     descriptions.add(page.match(/<meta name="description" content="([^"]+)">/)?.[1]);
   }
   assert.ok(!titles.has(undefined) && titles.size === cards.length);
   assert.ok(!descriptions.has(undefined) && descriptions.size === cards.length);
+});
+
+test('collection pages list the correct products and link back from each model', async () => {
+  const home = html.match(/<link rel="canonical" href="([^"]+)">/)[1];
+  for (const [slug, category] of Object.entries(collections)) {
+    const path = `/collections/${slug}/`;
+    assert.ok(html.includes(`href="${path}"`), slug);
+    const page = await read(`${path.slice(1)}index.html`);
+    const canonical = new URL(path, home).href;
+    assert.ok(page.includes(`<link rel="canonical" href="${canonical}">`), slug);
+    const models = cards.filter(([, , categories]) => matchesFilter(categories, category));
+    const expected = models.map(([, id]) => `/products/${id}/`);
+    assert.deepEqual([...page.matchAll(/href="(\/products\/[^"/]+\/)"/g)].map(([, href]) => href), expected, slug);
+    const data = JSON.parse(page.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)[1]);
+    const list = data['@graph'].find((entry) => entry['@type'] === 'ItemList');
+    assert.deepEqual(list.itemListElement.map(({ url }) => url), expected.map((href) => new URL(href, home).href));
+    for (const [, id] of models) {
+      const modelPage = await read(`products/${id}/index.html`);
+      assert.ok(modelPage.includes(`href="${path}"`), id);
+      assert.match(page, /<img src="\/assets\//, slug);
+    }
+  }
+});
+
+test('the two buying guides have reciprocal language tags and self-canonicals', async () => {
+  const home = html.match(/<link rel="canonical" href="([^"]+)">/)[1];
+  for (const [index, path] of guidePaths.entries()) {
+    const page = await read(`${path.slice(1)}index.html`);
+    assert.ok(page.includes(`<html lang="${index === 0 ? 'en-IN' : 'hi-IN'}">`));
+    assert.ok(page.includes(`<link rel="canonical" href="${new URL(path, home)}">`));
+    for (const [locale, alternate] of [['en-IN', guidePaths[0]], ['hi-IN', guidePaths[1]], ['x-default', guidePaths[0]]]) {
+      assert.ok(page.includes(`<link rel="alternate" hreflang="${locale}" href="${new URL(alternate, home)}">`), path);
+    }
+    assert.ok(page.includes(`href="${guidePaths[1 - index]}"`), path);
+    assert.ok(html.includes(`href="${path}"`), path);
+  }
+});
+
+test('similar models are linked from product pages without JavaScript', async () => {
+  for (const [id, expected] of [
+    ['42-dressing', '48-classic'],
+    ['steel-trunk-1150-b', 'steel-trunk-1050-b'],
+    ['two-door-display-cabinet', 'glass-door-storage-cabinet'],
+  ]) {
+    const page = await read(`products/${id}/index.html`);
+    const related = page.match(/<section aria-labelledby="related-models-heading">([\s\S]*?)<\/section>/)?.[1];
+    assert.ok(related?.includes(`href="/products/${expected}/"`), id);
+    assert.ok(!related.includes(`href="/products/${id}/"`), id);
+  }
 });

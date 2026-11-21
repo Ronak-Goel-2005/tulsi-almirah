@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import heroImage from '../assets/hero-showroom.webp';
+import CollectionLinks from '../components/CollectionLinks.astro';
 import LeafDrift from '../components/LeafDrift.astro';
 import ModelDialog from '../components/ModelDialog.astro';
 import ProductCard from '../components/ProductCard.astro';
@@ -8,6 +9,8 @@ import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteIntro from '../components/SiteIntro.astro';
 import { products } from '../data/products';
+import { showroom } from '../data/showroom';
+import { guidePath } from '../data/steel-almirah-guide';
 import StorefrontLayout from '../layouts/StorefrontLayout.astro';
 import { matchesFilter } from '../lib/catalogue';
 
@@ -83,6 +86,11 @@ const filters = [
         <h2 id="collection-heading">Find your almirah</h2>
         <a class="collection-jump" href="#other-storage">Browse trunks and other storage</a>
       </div>
+      <div class="catalogue-page-links">
+        <CollectionLinks />
+        <a class="collection-jump" href={guidePath('en')}>Steel almirah buying guide</a>
+        <a class="collection-jump" href={guidePath('hi')} lang="hi-IN">अलमारी खरीदने की गाइड</a>
+      </div>
       <div class="filter-bar" hidden>
         <div class="filters flex flex-wrap gap-[.45rem]" role="group" aria-label="Filter almirahs">
           {filters.map(({ id, label }) => (
@@ -131,21 +139,21 @@ const filters = [
     <section id="showroom" class="showroom" aria-labelledby="showroom-heading">
       <div class="wrap showroom-inner">
         <div class="showroom-copy">
-          <h2 id="showroom-heading">See it in person</h2>
+          <h2 id="showroom-heading">Visit our showroom in Shamli</h2>
           <p>See finishes, locks and storage layouts in person. Call ahead to check current prices, availability, fitting and delivery for your chosen product.</p>
           <div class="actions">
-            <a class="button button-lime" href="https://www.google.com/maps/dir/?api=1&amp;destination=29.5230328%2C77.3778569">Get directions</a>
-            <a class="button button-light-outline" href="tel:+917017226298">Call 70172 26298</a>
+            <a class="button button-lime" href={showroom.directions}>Get directions</a>
+            <a class="button button-light-outline" href={`tel:${showroom.phone}`}>Call {showroom.phoneLabel}</a>
           </div>
         </div>
         <div class="showroom-details">
-          <h3>Find us in Hind</h3>
-          <address>G9FH+55, Hind, Shamli<br>Uttar Pradesh 247777</address>
+          <h3>Showroom address and hours</h3>
+          <address>{showroom.streetAddress}, {showroom.locality}, {showroom.district}<br>{showroom.region} {showroom.postalCode}</address>
           <dl class="showroom-hours">
             <dt>Opening hours</dt>
             <dd><time datetime="10:00">10 am</time>–<time datetime="18:00">6 pm</time></dd>
           </dl>
-          <a href="https://www.google.com/maps?cid=12807746779321614385">View on Google Maps</a>
+          <a href={showroom.maps}>View on Google Maps</a>
         </div>
       </div>
     </section>

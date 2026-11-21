@@ -1,0 +1,20 @@
+---
+import type { Breadcrumb } from '../lib/breadcrumbs';
+
+interface Props {
+  items: readonly Breadcrumb[];
+  label?: string;
+}
+
+const { items, label = 'Breadcrumb' } = Astro.props;
+---
+
+<nav class="product-breadcrumb" aria-label={label}>
+  <ol>
+    {items.map(({ name, path }, index) => (
+      index === items.length - 1
+        ? <li aria-current="page">{name}</li>
+        : <li><a href={path}>{name}</a></li>
+    ))}
+  </ol>
+</nav>

@@ -1,20 +1,31 @@
 ---
 import '../styles/storefront.css';
+import { showroom } from '../data/showroom';
 
 interface Props {
   title?: string;
   description?: string;
-  image?: { src: string; alt: string };
+  image?: { src: string; alt: string; width: number; height: number };
+  locale?: 'en-IN' | 'hi-IN';
+  alternates?: readonly { locale: string; path: string }[];
   structuredData?: object;
 }
 
 const {
-  title = 'Tulsi Almirah | Steel Almirah Showroom in Shamli',
-  description = 'Explore Tulsi’s catalogue of steel almirahs, trunks, lockers, cabinets and shelving in Hind, Shamli. View photos, sizes and model codes.',
-  image = { src: '/assets/tulsi-cover.webp', alt: 'Red Tulsi steel almirah with a mirror and open shelves' },
+  title = 'Steel Almirahs in Shamli | Tulsi Almirah Showroom',
+  description = 'Compare steel almirahs, mirrored wardrobes and trunks at Tulsi Almirah in Hind, Shamli. See model photos and sizes, or ask about custom orders and wall fitting.',
+  locale = 'en-IN',
+  image = {
+    src: '/assets/tulsi-cover.webp',
+    alt: locale === 'hi-IN' ? 'शीशे और खुली शेल्फ़ वाली लाल तुलसी अलमारी' : 'Red Tulsi steel almirah with a mirror and open shelves',
+    width: 319,
+    height: 439,
+  },
+  alternates = [],
   structuredData: pageStructuredData,
 } = Astro.props;
 const site = Astro.site!;
+const home = new URL('/', site).href;
 const canonical = new URL(Astro.url.pathname, site).href;
 const shareImage = new URL(image.src, site).href;
 const structuredData = pageStructuredData ?? {
@@ -22,59 +33,65 @@ const structuredData = pageStructuredData ?? {
   "@graph": [
     {
       "@type": "WebSite",
-      "@id": `${canonical}#website`,
-      "name": "Tulsi Almirah",
-      "url": canonical,
-      "publisher": { "@id": `${canonical}#showroom` }
+      "@id": `${home}#website`,
+      "name": showroom.name,
+      "url": home,
+      "inLanguage": ["en-IN", "hi-IN"],
+      "publisher": { "@id": `${home}#showroom` }
     },
     {
       "@type": "FurnitureStore",
-      "@id": `${canonical}#showroom`,
-      "name": "Tulsi Almirah",
-      "url": canonical,
+      "@id": `${home}#showroom`,
+      "name": showroom.name,
+      "url": home,
       "description": "Steel furniture showroom in Hind, Shamli. Browse powder-coated almirahs, steel trunks, lockers, drawer units, display cabinets and shelving. Custom almirah orders and wall fitting are available.",
-      "telephone": "+917017226298",
+      "telephone": showroom.phone,
       "logo": new URL('/assets/tulsi-logo.webp', site).href,
       "image": shareImage,
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "G9FH+55",
-        "addressLocality": "Hind",
-        "addressRegion": "Uttar Pradesh",
-        "postalCode": "247777",
+        "streetAddress": showroom.streetAddress,
+        "addressLocality": `${showroom.locality}, ${showroom.district}`,
+        "addressRegion": showroom.region,
+        "postalCode": showroom.postalCode,
         "addressCountry": "IN"
       },
       "geo": {
         "@type": "GeoCoordinates",
-        "latitude": 29.5230328,
-        "longitude": 77.3778569
+        "latitude": showroom.latitude,
+        "longitude": showroom.longitude
       },
-      "hasMap": "https://www.google.com/maps?cid=12807746779321614385"
+      "hasMap": showroom.maps
     }
   ]
 };
 ---
 
 <!doctype html>
-<html lang="en-IN">
+<html lang={locale}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content={description}>
+  <meta name="robots" content="max-image-preview:large">
   <meta name="theme-color" content="#1a2a21">
   <title>{title}</title>
   <link rel="canonical" href={canonical}>
+  {alternates.map(({ locale, path }) => <link rel="alternate" hreflang={locale} href={new URL(path, site).href}>)}
   <meta property="og:type" content="website">
-  <meta property="og:locale" content="en_IN">
-  <meta property="og:site_name" content="Tulsi Almirah">
+  <meta property="og:locale" content={locale.replace('-', '_')}>
+  <meta property="og:site_name" content={showroom.name}>
   <meta property="og:title" content={title}>
   <meta property="og:description" content={description}>
   <meta property="og:url" content={canonical}>
   <meta property="og:image" content={shareImage}>
+  <meta property="og:image:width" content={String(image.width)}>
+  <meta property="og:image:height" content={String(image.height)}>
   <meta property="og:image:alt" content={image.alt}>
-  <link rel="icon" href="/assets/tulsi-logo.webp" type="image/webp">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="/favicon.png" type="image/png" sizes="96x96">
   <link rel="preload" href="/assets/instrument-serif.woff2" as="font" type="font/woff2" crossorigin>
-  <script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
+  <script type="application/ld+json" set:html={JSON.stringify(structuredData).replaceAll('<', '\\u003c')}></script>
 </head>
 <body>
   <slot />

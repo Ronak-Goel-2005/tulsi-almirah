@@ -1,35 +1,44 @@
 ---
+import { showroom } from '../data/showroom';
+
+interface Props {
+  hindi?: boolean;
+}
+
+const { hindi = false } = Astro.props;
 const home = Astro.url.pathname === '/' ? '' : '/';
 ---
 
 <footer class="site-footer">
   <div class="wrap footer-inner">
     <div class="footer-brand">
-      <a class="brand" href={home || "#"} aria-label="Tulsi Almirah home"><img src="/assets/tulsi-logo.webp" width="109" height="66" alt="Tulsi Almirah"></a>
-      <h2>Manufacturer</h2>
-      <address><strong>VNA Industries</strong><br>Khasra No. 911/1, Mahavatpur Road<br>Heend, Shamli, Uttar Pradesh 247777, India</address>
+      <a class="brand" href="/" aria-label={hindi ? 'तुलसी अलमारी का मुखपृष्ठ' : 'Tulsi Almirah home'}><img src="/assets/tulsi-logo.webp" width="109" height="66" alt={hindi ? 'तुलसी अलमारी' : showroom.name}></a>
+      <h2>{hindi ? 'निर्माता' : 'Manufacturer'}</h2>
+      <address lang={hindi ? 'en-IN' : undefined}><strong>VNA Industries</strong><br>Khasra No. 911/1, Mahavatpur Road<br>Heend, Shamli, Uttar Pradesh 247777, India</address>
     </div>
     <nav aria-labelledby="footer-explore">
-      <h2 id="footer-explore">Explore</h2>
+      <h2 id="footer-explore">{hindi ? 'और देखें' : 'Explore'}</h2>
       <ul class="footer-links">
-        <li><a href={`${home}#collection`}>Browse models and sizes</a></li>
-        <li><a href={`${home}#other-storage`}>Trunks and other storage</a></li>
-        <li><a href={`${home}#services`}>Custom orders &amp; wall fitting</a></li>
-        <li><a href={`${home}#showroom`}>Showroom</a></li>
+        <li><a href={`${home}#collection`}>{hindi ? 'मॉडल और साइज़' : 'Browse models and sizes'}</a></li>
+        <li><a href={`${home}#other-storage`}>{hindi ? 'बक्से और स्टोरेज' : 'Trunks and other storage'}</a></li>
+        <li><a href={`${home}#services`}>{hindi ? 'कस्टम ऑर्डर और फिटिंग' : 'Custom orders & wall fitting'}</a></li>
+        <li><a href={`${home}#showroom`}>{hindi ? 'शोरूम' : 'Showroom'}</a></li>
       </ul>
     </nav>
     <div>
-      <h2>Contact the shop</h2>
+      <h2>{hindi ? 'संपर्क करें' : 'Contact the shop'}</h2>
       <ul class="footer-links">
-        <li><a href="tel:+917017226298">+91 70172 26298</a></li>
-        <li><a href="https://wa.me/917017226298">Message on WhatsApp</a></li>
+        <li><a href={`tel:${showroom.phone}`}>{showroom.phoneLabel}</a></li>
+        <li><a href={showroom.whatsapp}>{hindi ? 'WhatsApp पर संदेश भेजें' : 'Message on WhatsApp'}</a></li>
       </ul>
     </div>
     <div>
-      <h2>Visit us</h2>
-      <address>G9FH+55, Hind, Shamli<br>Uttar Pradesh 247777</address>
-      <p class="footer-hours">Hours <time datetime="10:00">10 am</time>–<time datetime="18:00">6 pm</time></p>
-      <a class="footer-map" href="https://www.google.com/maps/dir/?api=1&amp;destination=29.5230328%2C77.3778569">Get directions</a>
+      <h2>{hindi ? 'शोरूम का पता' : 'Visit us'}</h2>
+      <address>
+        {showroom.streetAddress}, {hindi ? 'हिंड, शामली' : `${showroom.locality}, ${showroom.district}`}<br>{hindi ? 'उत्तर प्रदेश' : showroom.region} {showroom.postalCode}
+      </address>
+      <p class="footer-hours">{hindi ? 'समय' : 'Hours'} <time datetime="10:00">{hindi ? 'सुबह 10 बजे' : '10 am'}</time>–<time datetime="18:00">{hindi ? 'शाम 6 बजे' : '6 pm'}</time></p>
+      <a class="footer-map" href={showroom.directions}>{hindi ? 'रास्ता देखें' : 'Get directions'}</a>
     </div>
   </div>
 </footer>

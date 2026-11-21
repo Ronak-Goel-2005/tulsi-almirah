@@ -1,8 +1,12 @@
 ---
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
 import SiteHeader from '../../components/SiteHeader.astro';
+import { collections, collectionPath } from '../../data/collections';
 import { products, type Product } from '../../data/products';
+import { showroom } from '../../data/showroom';
 import StorefrontLayout from '../../layouts/StorefrontLayout.astro';
+import { breadcrumbSchema, type Breadcrumb } from '../../lib/breadcrumbs';
 import { productEnquiry, productPath } from '../../lib/catalogue';
 
 export function getStaticPaths() {
@@ -18,11 +22,24 @@ const { name, photo, catalogueCode, dimensions, interiorPhoto, alternatePhoto } 
 const isAlmirah = !product.categories.includes('storage');
 const heading = isAlmirah ? `${name} Steel Almirah` : name;
 const title = `${heading} | Tulsi Almirah, Shamli`;
-const description = `${product.description} View catalogue photos and enquire at the Tulsi showroom in Hind, Shamli.`;
-const home = new URL('/', Astro.site).href;
-const canonical = new URL(productPath(product.id), home).href;
-const photoUrl = `/${photo.src}`;
 const size = dimensions?.values.join(' × ');
+const sizeSummary = isAlmirah && size ? ` ${size} inches (W × D × H).` : '';
+const description = `${product.description}${sizeSummary} View photos and enquire at Tulsi Almirah in Shamli.`;
+const site = Astro.site!;
+const home = new URL('/', site).href;
+const path = productPath(product.id);
+const canonical = new URL(path, site).href;
+const photoUrl = `/${photo.src}`;
+const modelCollections = collections.filter(({ category }) => product.categories.includes(category));
+const [primaryCollection, ...otherCollections] = modelCollections;
+const breadcrumbs: Breadcrumb[] = [{ name: 'Home', path: '/' }];
+if (primaryCollection) breadcrumbs.push({ name: primaryCollection.label, path: collectionPath(primaryCollection.id) });
+breadcrumbs.push({ name: heading, path });
+const modelCategory = product.categories.find((category) => category !== 'storage');
+const relatedModels = products
+  .filter((candidate) => candidate.id !== product.id && candidate.categories.some((category) => category === modelCategory))
+  .sort((left, right) => Number(right.type === product.type) - Number(left.type === product.type))
+  .slice(0, 3);
 const structuredData = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -33,29 +50,23 @@ const structuredData = {
       name: heading,
       description,
       isPartOf: { '@id': `${home}#website` },
+      primaryImageOfPage: {
+        '@type': 'ImageObject',
+        contentUrl: new URL(photoUrl, home).href,
+        width: photo.width,
+        height: photo.height,
+      },
       breadcrumb: { '@id': `${canonical}#breadcrumbs` },
     },
-    {
-      '@type': 'BreadcrumbList',
-      '@id': `${canonical}#breadcrumbs`,
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: home },
-        { '@type': 'ListItem', position: 2, name, item: canonical },
-      ],
-    },
+    { ...breadcrumbSchema(breadcrumbs, site), '@id': `${canonical}#breadcrumbs` },
   ],
 };
 ---
 
-<StorefrontLayout {title} {description} image={{ src: photoUrl, alt: photo.alt }} {structuredData}>
+<StorefrontLayout {title} {description} image={{ ...photo, src: photoUrl }} {structuredData}>
   <SiteHeader />
   <main id="main" class="product-detail wrap" tabindex="-1">
-    <nav class="product-breadcrumb" aria-label="Breadcrumb">
-      <ol>
-        <li><a href="/">Home</a></li>
-        <li aria-current="page">{name}</li>
-      </ol>
-    </nav>
+    <Breadcrumbs items={breadcrumbs} />
 
     <div class="product-detail-grid">
       <div class="product-detail-copy">
@@ -77,7 +88,7 @@ const structuredData = {
 
         <div class="actions">
           <a class="button button-green" href={productEnquiry(name, catalogueCode, isAlmirah)}>Ask on WhatsApp</a>
-          <a class="button button-outline" href="tel:+917017226298">Call the shop</a>
+          <a class="button button-outline" href={`tel:${showroom.phone}`}>Call the shop</a>
         </div>
 
         <section class="product-detail-notes" aria-labelledby="catalogue-heading">
@@ -86,7 +97,22 @@ const structuredData = {
           {dimensions && <p>Printed size {size} / {dimensions.catalogueSuffix}. The number after the slash is unlabelled in the brochure.</p>}
           <p>September 2025 catalogue, page {product.cataloguePage}.</p>
         </section>
-        <a class="collection-jump" href={isAlmirah ? '/#collection' : '/#other-storage'}>Browse the collection</a>
+        {relatedModels.length > 0 && (
+          <section aria-labelledby="related-models-heading">
+            <h2 id="related-models-heading">Similar models</h2>
+            <ul class="related-models">
+              {relatedModels.map((model) => (
+                <li><a class="collection-jump" href={productPath(model.id)}>{model.name}{isAlmirah ? ' Steel Almirah' : ''}</a></li>
+              ))}
+            </ul>
+          </section>
+        )}
+        <ul class="collection-links">
+          {otherCollections.map(({ id, label }) => <li><a class="collection-jump" href={collectionPath(id)}>{label}</a></li>)}
+          <li><a class="collection-jump" href={isAlmirah ? '/#collection' : '/#other-storage'}>
+            {isAlmirah ? 'Browse all almirahs' : 'Browse all storage furniture'}
+          </a></li>
+        </ul>
       </div>
 
       <div class="product-detail-photos">
