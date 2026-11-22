@@ -113,42 +113,97 @@ document.addEventListener('keydown', (event) => {
   event.preventDefault();
   fadeIntro();
 });
-if (motionPreference.matches) {
+const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+const referrer = document.referrer ? new URL(document.referrer) : undefined;
+const returningHome = navigation?.type === 'back_forward'
+  || (navigation?.type === 'navigate' && referrer?.origin === location.origin);
+const landingAtTop = !location.hash || location.hash === '#top';
+
+if (motionPreference.matches && !returningHome && landingAtTop && !new URLSearchParams(location.search).has('model')) {
+  const artwork = intro.querySelector<HTMLTemplateElement>('#intro-artwork')!;
+  artwork.replaceWith(artwork.content);
   storefront.forEach((element) => { element.inert = true; });
   document.body.classList.add('has-opening-intro');
   intro.hidden = false;
   introTimer = setTimeout(fadeIntro, 2500);
 }
 
-const filters = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+const filterBar = document.querySelector<HTMLElement>('.filter-bar')!;
+const styleFilters = filterBar.querySelectorAll<HTMLButtonElement>('[data-filter]');
+const widthFilters = filterBar.querySelectorAll<HTMLButtonElement>('[data-width-filter]');
 const catalogue = document.querySelector('#collection .catalogue')!;
 const almirahs = catalogue.querySelectorAll<HTMLElement>('.product');
 const filterStatus = document.querySelector('#filter-status')!;
+const clearFilters = filterBar.querySelector<HTMLButtonElement>('.filter-clear')!;
+const filterEmpty = document.querySelector<HTMLElement>('.filter-empty')!;
+let selectedStyle = 'all';
+let selectedWidth = 'all';
 let filterAnimation: Animation | undefined;
-for (const filter of filters) {
-  filter.addEventListener('click', () => {
-    if (filter.getAttribute('aria-pressed') === 'true') return;
 
-    for (const button of filters) {
-      button.setAttribute('aria-pressed', String(button === filter));
-    }
-    let visible = 0;
-    for (const product of almirahs) {
-      product.hidden = !matchesFilter(product.dataset.categories!, filter.dataset.filter!);
-      visible += Number(!product.hidden);
-    }
-    filterStatus.textContent = `${visible} ${visible === 1 ? 'model' : 'models'}`;
+function updateFilters() {
+  const categoriesAtWidth: string[] = [];
+  const widthsForStyle: (string | undefined)[] = [];
+  let visible = 0;
+  for (const product of almirahs) {
+    const { categories = '', width } = product.dataset;
+    const styleMatches = matchesFilter(categories, selectedStyle);
+    const widthMatches = selectedWidth === 'all' || width === selectedWidth;
+    if (widthMatches) categoriesAtWidth.push(categories);
+    if (styleMatches) widthsForStyle.push(width);
+    const hidden = !(styleMatches && widthMatches);
+    if (product.hidden !== hidden) product.hidden = hidden;
+    visible += Number(!hidden);
+  }
 
-    filterAnimation?.cancel();
+  for (const button of styleFilters) {
+    const style = button.dataset.filter!;
+    button.setAttribute('aria-pressed', String(style === selectedStyle));
+    button.querySelector('.filter-count')!.textContent = String(categoriesAtWidth.filter((categories) => matchesFilter(categories, style)).length);
+  }
+  for (const button of widthFilters) {
+    const width = button.dataset.widthFilter!;
+    button.setAttribute('aria-pressed', String(width === selectedWidth));
+    const count = width === 'all' ? widthsForStyle.length : widthsForStyle.filter((value) => value === width).length;
+    button.querySelector('.filter-count')!.textContent = String(count);
+  }
+
+  filterEmpty.hidden = visible > 0;
+  clearFilters.hidden = selectedStyle === 'all' && selectedWidth === 'all';
+  const status = `${visible} ${visible === 1 ? 'model' : 'models'}`;
+  if (filterStatus.textContent !== status) {
+    filterStatus.textContent = status;
+    filterStatus.getAnimations().forEach((animation) => animation.cancel());
     if (motionPreference.matches) {
-      filterAnimation = catalogue.animate(
-        [{ opacity: 0.65, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }],
-        { duration: 280, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+      filterStatus.animate(
+        [{ opacity: .6, transform: 'translateY(3px)' }, { opacity: 1, transform: 'translateY(0)' }],
+        { duration: 180, easing: 'ease-out' },
       );
     }
-  });
+  }
+  filterAnimation?.cancel();
+  if (visible && motionPreference.matches) {
+    filterAnimation = catalogue.animate(
+      [{ opacity: 0.65, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }],
+      { duration: 280, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+    );
+  }
 }
-document.querySelector<HTMLElement>('.filter-bar')!.hidden = false;
+
+filterBar.addEventListener('click', (event) => {
+  const button = (event.target as Element).closest<HTMLButtonElement>('[data-filter], [data-width-filter]');
+  if (!button || button.getAttribute('aria-pressed') === 'true') return;
+  if (button.dataset.filter) selectedStyle = button.dataset.filter;
+  else selectedWidth = button.dataset.widthFilter!;
+  updateFilters();
+});
+clearFilters.addEventListener('click', () => {
+  selectedStyle = 'all';
+  selectedWidth = 'all';
+  updateFilters();
+  styleFilters[0].focus();
+});
+
+filterBar.hidden = false;
 almirahs.forEach(enableCardPreview);
 
 const dialog = document.querySelector<HTMLDialogElement>('#model-dialog')!;
@@ -258,12 +313,13 @@ function enableModelDetails(dialog: HTMLDialogElement, products: NodeListOf<HTML
   window.addEventListener('popstate', syncModel);
 
   function openLinkedModel() {
-    // Finish the opening sequence and the browser's fragment navigation before moving focus.
-    if (!intro.hidden || document.readyState !== 'complete') return;
+    // Leave time for the browser to position a section fragment before moving focus.
+    if (!intro.hidden || (location.hash && document.readyState !== 'complete')) return;
     requestAnimationFrame(() => {
       if (!dialog.open) syncModel();
     });
   }
   window.addEventListener('load', openLinkedModel, { once: true });
   intro.addEventListener('introend', openLinkedModel, { once: true });
+  if (new URLSearchParams(location.search).has('model')) openLinkedModel();
 }

@@ -20,6 +20,7 @@ const linkLabel = isStorage ? name.charAt(0).toLowerCase() + name.slice(1) : nam
   class="product"
   id={product.id}
   data-categories={product.categories.join(' ')}
+  data-width={!isStorage ? dimensions?.values[0] : undefined}
   data-catalogue-code={product.catalogueCode}
   data-catalogue-size={printedSize}
   data-interior-photo={interiorPhoto && `/${interiorPhoto}`}
@@ -27,7 +28,7 @@ const linkLabel = isStorage ? name.charAt(0).toLowerCase() + name.slice(1) : nam
   data-alternate-caption={alternatePhoto?.caption}
 >
   <div class="product-image">
-    <img src={`/${photo.src}`} alt={photo.alt} width={photo.width} height={photo.height} loading="lazy">
+    <img src={`/${photo.src}`} alt={photo.alt} width={photo.width} height={photo.height} loading="lazy" decoding="async">
     {interiorPhoto && (
       <button class="preview-photo" type="button" data-preview-photo aria-pressed="false" hidden>Inside view</button>
     )}

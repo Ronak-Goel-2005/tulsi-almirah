@@ -1,7 +1,6 @@
 ---
 import { getImage, Image } from 'astro:assets';
 import heroImage from '../assets/hero-showroom.webp';
-import CollectionLinks from '../components/CollectionLinks.astro';
 import LeafDrift from '../components/LeafDrift.astro';
 import ModelDialog from '../components/ModelDialog.astro';
 import ProductCard from '../components/ProductCard.astro';
@@ -26,13 +25,19 @@ const shareImage = {
 const almirahs = products.filter(({ categories }) => !categories.includes('storage'));
 const trunks = products.filter(({ categories }) => categories.includes('trunk'));
 const otherStorage = products.filter(({ categories }) => categories.includes('storage') && !categories.includes('trunk'));
-const filters = [
-  { id: 'all', label: 'All almirahs' },
+const styleFilters = [
+  { id: 'all', label: 'All styles' },
   { id: 'two-door', label: 'Two-door' },
   { id: 'three-door', label: 'Three-door' },
   { id: 'five-door', label: 'Five-door' },
   { id: 'mirror', label: 'With mirror' },
   { id: 'dressing', label: 'Dressing' },
+];
+const widths = [...new Set(almirahs.flatMap(({ dimensions }) => dimensions ? [dimensions.values[0]] : []))]
+  .sort((left, right) => left - right);
+const widthFilters = [
+  { id: 'all', label: 'Any' },
+  ...widths.map((width) => ({ id: String(width), label: `${width}″` })),
 ];
 ---
 
@@ -92,26 +97,44 @@ const filters = [
     <section id="collection" class="collection wrap" aria-labelledby="collection-heading">
       <div class="collection-heading">
         <h2 id="collection-heading">Find your almirah</h2>
-        <a class="collection-jump" href="#other-storage">Browse trunks and other storage</a>
-      </div>
-      <div class="catalogue-page-links">
-        <CollectionLinks />
       </div>
       <div class="filter-bar" hidden>
-        <div class="filters flex flex-wrap gap-[.45rem]" role="group" aria-label="Filter almirahs">
-          {filters.map(({ id, label }) => (
-            <button type="button" data-filter={id} aria-pressed={id === 'all' ? 'true' : 'false'}>
-              {label}
-              <span class="filter-count" aria-hidden="true">
-                {almirahs.filter((product) => matchesFilter(product.categories.join(' '), id)).length}
-              </span>
-            </button>
-          ))}
+        <div class="filter-group style-filter-group" role="group" aria-labelledby="filter-style-label">
+          <span class="filter-label" id="filter-style-label">Style</span>
+          <div class="filters flex flex-wrap gap-[.45rem]">
+            {styleFilters.map(({ id, label }) => (
+              <button type="button" data-filter={id} aria-pressed={id === 'all' ? 'true' : 'false'}>
+                {label}
+                <span class="filter-count" aria-hidden="true">
+                  {almirahs.filter((product) => matchesFilter(product.categories.join(' '), id)).length}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
-        <p class="visually-hidden" id="filter-status" role="status"></p>
+        <div class="filter-group" role="group" aria-labelledby="filter-width-label">
+          <span class="filter-label" id="filter-width-label">Width</span>
+          <div class="filters width-filters flex flex-wrap gap-[.45rem]">
+            {widthFilters.map(({ id, label }) => (
+              <button type="button" data-width-filter={id} aria-label={id === 'all' ? 'Any width' : `${id} inches`} aria-pressed={id === 'all' ? 'true' : 'false'}>
+                {label}
+                <span class="filter-count" aria-hidden="true">
+                  {id === 'all' ? almirahs.length : almirahs.filter(({ dimensions }) => String(dimensions?.values[0]) === id).length}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div class="filter-results">
+          <p id="filter-status" role="status">{almirahs.length} models</p>
+          <button type="button" class="filter-clear" hidden>Clear filters</button>
+        </div>
       </div>
       <div class="catalogue">
         {almirahs.map((product) => <ProductCard product={product} />)}
+      </div>
+      <div class="filter-empty" hidden>
+        <p>No almirahs match these filters.</p>
       </div>
     </section>
 

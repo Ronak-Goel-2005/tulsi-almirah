@@ -1,16 +1,36 @@
 ---
+import { Image } from 'astro:assets';
+import branchImage from '../assets/intro-tree-branch.webp';
 import LeafDrift from './LeafDrift.astro';
+
+// The CSS silhouette uses only the WebP alpha channel.
+const branchQuality = 1;
 ---
 
 <button class="site-intro" type="button" aria-label="Skip intro" aria-describedby="intro-credentials" hidden>
   <LeafDrift className="intro-leaves" />
-  <img class="site-intro-plant" src="assets/potted-tulsi.svg" width="224" height="280" alt="">
-  <img class="site-intro-logo" src="assets/tulsi-logo.webp" width="138" height="83" alt="">
-  <span class="intro-credentials" id="intro-credentials">
-    <span class="intro-product">A VNA Industries Product</span>
-    <span class="intro-credential-labels">
-      <span>Made in India</span>
-      <span>ISO certified company</span>
+  <template id="intro-artwork">
+    <Image
+      class="site-intro-branch"
+      src={branchImage}
+      widths={[176, 352, 480, 832]}
+      sizes="clamp(8.75rem, min(41vw, 55svh), 26rem)"
+      format="webp"
+      quality={branchQuality}
+      decoding="async"
+      alt=""
+    />
+    <img class="site-intro-plant" src="/assets/potted-tulsi.svg" width="224" height="280" alt="">
+  </template>
+  <span class="intro-brand">
+    <img class="site-intro-logo" src="assets/tulsi-logo.webp" width="138" height="83" alt="">
+    <span class="intro-credentials" id="intro-credentials">
+      <span class="intro-product">A VNA Industries Product</span>
+      <span class="intro-credential-labels">
+        <span>Made in India</span>
+        <span>ISO certified company</span>
+      </span>
     </span>
   </span>
+  <span class="intro-skip" aria-hidden="true">Skip intro</span>
 </button>

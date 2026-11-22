@@ -6,14 +6,17 @@ Tulsi Almirah is a steel furniture showroom in Hind, Shamli, Uttar Pradesh. This
 
 ## Catalogue and storefront
 
-- Filter 12 almirah models by door count, mirrors, or dressing layout. The catalogue also includes two steel trunks and six other storage designs.
+- Combine 36″, 42″, or 48″ widths with door count, mirror, and dressing filters across 12 almirah models. The results count updates as you filter, and **Clear filters** resets both selections.
+- Use **Collection** to browse dedicated catalogue pages, jump to the homepage storage section, or open the [steel almirah buying guide](https://tulsi-almirah.vercel.app/guides/steel-almirah/en/). The guide is available in English and Hindi.
+- Select the navbar logo to scroll back to the top of the homepage or return there from a catalogue, product, or guide page.
+- Browse two steel trunks and six other storage designs, including lockers, cabinets, and shelving.
 - Open a quick view or a shareable product page with available photos, dimensions, model codes, and notes from the September 2025 catalogue. Product pages work without JavaScript.
 - Send a model-specific WhatsApp enquiry, call the shop, or get directions to the showroom.
-- Skip the opening animation by clicking, tapping, or pressing Escape. The intro and decorative leaf animations respect reduced-motion preferences.
+- Select **Skip intro** or press Escape to continue to the storefront. Direct links to catalogue sections and model quick views, internal returns to the homepage, and reduced-motion visits bypass the intro.
 
 ## Stack
 
-Astro generates the static pages and responsive hero images. TypeScript handles the catalogue interactions, and Tailwind CSS and custom CSS handle the layout and animations.
+Astro generates the static pages and responsive WebP artwork. TypeScript handles filtering and quick views, and Tailwind CSS and custom CSS handle the layout and animations. Nunito Sans and Noto Sans Devanagari are self-hosted.
 
 ## Run locally
 
@@ -43,4 +46,4 @@ Vercel serves the static build. Astro uses the production domain for canonical l
 
 ## Catalogue imagery
 
-Product photos, dimensions, model codes and manufacturing details come from the September 2025 Tulsi Almirah catalogue. The homepage setting is an ImageGen illustration.
+Product photos, dimensions, model codes, and manufacturing details come from the September 2025 Tulsi Almirah catalogue. The homepage setting and intro branch artwork were created with ImageGen.

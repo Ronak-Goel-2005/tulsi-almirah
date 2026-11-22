@@ -72,3 +72,17 @@ const structuredData = {
   </main>
   <SiteFooter {hindi} />
 </StorefrontLayout>
+
+<style>
+  @font-face {
+    font-family: "Noto Sans Devanagari Guide Label";
+    src: url("/assets/noto-sans-devanagari-guide-link.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 650;
+    font-display: swap;
+  }
+
+  .collection-jump[lang="hi-IN"] {
+    font-family: "Noto Sans Devanagari Guide Label", "Nirmala UI", system-ui, sans-serif;
+  }
+</style>

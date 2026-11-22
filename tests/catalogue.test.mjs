@@ -37,6 +37,19 @@ test('all catalogue filters select the expected number of distinct models', () =
   }
 });
 
+test('the homepage offers all three almirah widths with the correct initial counts', () => {
+  const controls = [...html.matchAll(/<button\b[^>]*\bdata-width-filter="([^"]+)"[^>]*>[\s\S]*?<span class="filter-count"[^>]*>\s*(\d+)\s*<\/span>\s*<\/button>/g)];
+  assert.deepEqual(controls.map(([, width, count]) => [width, Number(count)]), [['all', 12], ['36', 2], ['42', 4], ['48', 6]]);
+  assert.ok(storage.every(([article]) => !article.includes('data-width=')));
+});
+
+test('the filters publish the initial result total and a clear control', () => {
+  const controls = html.match(/<div class="filter-results">([\s\S]*?)<\/div>/)?.[1];
+  assert.ok(controls, 'filter results belong with the controls');
+  assert.match(controls, /<p id="filter-status" role="status">12 models<\/p>/);
+  assert.match(controls, /<button[^>]*\bhidden>Clear filters<\/button>/);
+});
+
 test('every almirah has two published WebP files and a link to its model page', async () => {
   for (const [article, id, , card] of almirahs) {
     const title = card.match(/<h3>([^<]+)<\/h3>/)[1];
@@ -73,6 +86,7 @@ test('all almirahs use the printed catalogue dimensions, size entries and model 
     const [width, depth, height, code, suffix] = expected[id];
     const displayedSize = card.match(/<p class="product-size">([^<]+)<\/p>/)?.[1].replaceAll('&#39;', "'");
     assert.equal(displayedSize, `${width} × ${depth} × ${height}''`, id);
+    assert.equal(article.match(/data-width="(\d+)"/)?.[1], String(width), id);
     assert.equal(article.match(/data-catalogue-code="([^"]+)"/)?.[1], code, id);
     assert.equal(article.match(/data-catalogue-size="([^"]+)"/)?.[1], `${width} × ${depth} × ${height} / ${suffix}`, id);
   }
@@ -139,7 +153,36 @@ test('removed catalogue copy, cover figure and About link stay off the storefron
   assert.doesNotMatch(html, /Compare 12 almirahs by layout and size/);
   assert.doesNotMatch(html, /Almirah from the September 2025 catalogue cover/);
   assert.doesNotMatch(html, /<section id="about"|href="#about"/);
-  assert.match(html, /<a class="collection-jump" href="#other-storage">/);
+});
+
+test('the shared navigation gives visitors access to the catalogue links', async () => {
+  const categoryLinks = Object.keys(collections).map((slug) => `/collections/${slug}/`);
+  const collection = html.match(/<section id="collection"[^>]*>[\s\S]*?<\/section>/)?.[0];
+  assert.ok(collection);
+  for (const path of ['', 'products/42-hero/', 'guides/steel-almirah/hi/']) {
+    const page = path ? await read(`${path}index.html`) : html;
+    const navigation = page.match(/<header class="site-header">[\s\S]*?<nav\b([\s\S]*?)<\/nav>/)?.[1];
+    assert.ok(navigation, path || 'homepage');
+    const home = path ? '/' : '';
+    const guide = path === 'guides/steel-almirah/hi/' ? guidePaths[1] : guidePaths[0];
+    for (const href of [`${home}#collection`, `${home}#other-storage`, guide, ...categoryLinks]) {
+      assert.ok(navigation.includes(`href="${href}"`), `${path || 'homepage'} links to ${href}`);
+    }
+    if (!path) {
+      assert.match(navigation, /href="\/collections\/steel-trunks-and-storage\/">Trunks and storage catalogue<\/a>/);
+      assert.match(navigation, /href="#other-storage">Storage on the homepage<\/a>/);
+    }
+  }
+  for (const href of ['#other-storage', ...categoryLinks]) {
+    assert.ok(!collection.includes(`href="${href}"`), `${href} belongs in the navigation`);
+  }
+});
+
+test('the navbar logo links to the top on the homepage and returns home from other pages', async () => {
+  assert.match(html, /<header class="site-header">\s*<div[^>]*>\s*<a class="brand" href="#top"/);
+  assert.match(html, /<body id="top">/);
+  const product = await read('products/42-hero/index.html');
+  assert.match(product, /<header class="site-header">\s*<div[^>]*>\s*<a class="brand" href="\/"/);
 });
 
 test('every product has notes tied to the correct source catalogue page', () => {
@@ -167,9 +210,27 @@ test('every product has notes tied to the correct source catalogue page', () => 
 test('the intro keeps its skip control and shows the manufacturing credentials', () => {
   const intro = html.match(/<button class="site-intro"[^>]*type="button"[^>]*aria-label="Skip intro"[^>]*hidden>([\s\S]*?)<\/button>/)?.[1];
   assert.ok(intro, 'intro skip button');
+  assert.match(intro, /<span class="intro-brand">\s*<img class="site-intro-logo"[^>]*>\s*<span class="intro-credentials"/);
+  assert.match(intro, /<span class="intro-skip"[^>]*>Skip intro<\/span>\s*$/);
   assert.match(intro, /<img class="site-intro-logo" src="assets\/tulsi-logo.webp"/);
   assert.match(intro, /A VNA Industries Product[\s\S]*<span>Made in India<\/span>/);
   assert.match(intro, /<span>ISO certified company<\/span>/);
+});
+
+test('intro artwork is loaded on demand and has a smaller WebP for narrow screens', async () => {
+  const template = html.match(/<template id="intro-artwork">([\s\S]*?)<\/template>/)?.[1];
+  assert.ok(template, 'the artwork stays inert until the intro opens');
+  const branch = template.match(/<img\b[^>]*\bclass="site-intro-branch"[^>]*>/)?.[0];
+  assert.ok(branch, 'the template contains the branch image');
+  const sources = branch.match(/srcset="([^"]+)"/)?.[1].split(/,\s*/) ?? [];
+  assert.ok(sources.length >= 2, 'the browser can choose a branch image for its display');
+  const sizes = await Promise.all(sources.map(async (source) => {
+    const [path, width] = source.split(' ');
+    return [parseInt(width, 10), await checkWebp(path.slice(1))];
+  }));
+  sizes.sort(([left], [right]) => left - right);
+  assert.ok(sizes[0][1] < sizes.at(-1)[1] / 2, 'the smallest candidate uses less than half the data');
+  assert.ok(sizes.at(-1)[1] < 70 * 1024, 'the largest decorative branch stays under 70 KB');
 });
 
 test('enquiry includes the full model name and the generic fallback', () => {
@@ -197,8 +258,10 @@ test('the storefront publishes the hero artwork and progressively enhances card 
   assert.match(html, /<meta property="og:image:height" content="800">/);
   const graph = JSON.parse(html.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)[1])['@graph'];
   assert.equal(graph.find((item) => item['@type'] === 'WebPage').primaryImageOfPage.contentUrl, shareImage.href);
-  const font = await readFile(new URL('assets/instrument-serif.woff2', publish));
-  assert.equal(font.toString('ascii', 0, 4), 'wOF2');
+  for (const file of ['nunito-sans.woff2', 'noto-sans-devanagari.woff2']) {
+    const font = await readFile(new URL(`assets/${file}`, publish));
+    assert.equal(font.toString('ascii', 0, 4), 'wOF2', file);
+  }
   for (const [, id, , card] of almirahs) {
     assert.match(card, /<button[^>]*data-preview-photo[^>]*\bhidden\b/, id);
   }
@@ -216,11 +279,10 @@ test('the published files include storefront assets and consistent crawl URLs', 
   assert.ok((await read('robots.txt')).includes(`Sitemap: ${canonical}sitemap.xml`));
   assert.ok((await read('sitemap.xml')).includes(`<loc>${canonical}</loc>`));
   const stylesheet = html.match(/<link rel="stylesheet" href="\/(_astro\/[^"]+\.css)"/)?.[1];
-  const storefront = html.match(/<script type="module" src="\/(_astro\/[^"]+\.js)"/)?.[1];
+  const scripts = [...html.matchAll(/<script type="module" src="\/(_astro\/[^"]+\.js)"/g)].map(([, path]) => path);
   assert.ok(stylesheet, 'a built stylesheet is linked');
-  assert.ok(storefront, 'a built storefront script is linked');
   assert.ok((await read(stylesheet)).includes('.site-intro'));
-  assert.ok((await read(storefront)).includes('introend'));
+  assert.ok((await Promise.all(scripts.map(read))).some((script) => script.includes('introend')), 'a built storefront script is linked');
   for (const file of ['tulsi-logo.webp', 'tulsi-cover.webp', 'potted-tulsi.svg']) {
     assert.ok((await readFile(new URL(`assets/${file}`, publish))).length > 0);
   }
@@ -293,6 +355,9 @@ test('the buying guides stay reachable through collections and their language sw
   const home = html.match(/<link rel="canonical" href="([^"]+)">/)[1];
   const collection = await read('collections/two-door-steel-almirahs/index.html');
   assert.ok(collection.includes(`href="${guidePaths[0]}"`));
+  const switchFont = await readFile(new URL('assets/noto-sans-devanagari-guide-link.woff2', publish));
+  assert.equal(switchFont.toString('ascii', 0, 4), 'wOF2');
+  assert.ok(switchFont.length < 8 * 1024, 'the language switch uses a small font subset');
   for (const [index, path] of guidePaths.entries()) {
     const page = await read(`${path.slice(1)}index.html`);
     assert.ok(page.includes(`<html lang="${index === 0 ? 'en-IN' : 'hi-IN'}">`));
@@ -301,7 +366,6 @@ test('the buying guides stay reachable through collections and their language sw
       assert.ok(page.includes(`<link rel="alternate" hreflang="${locale}" href="${new URL(alternate, home)}">`), path);
     }
     assert.ok(page.includes(`href="${guidePaths[1 - index]}"`), path);
-    assert.ok(!html.includes(`href="${path}"`), `guide link removed from the homepage ${path}`);
   }
 });
 

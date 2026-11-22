@@ -1,5 +1,7 @@
 ---
+import { collections, collectionPath } from '../data/collections';
 import { showroom } from '../data/showroom';
+import { guidePath } from '../data/steel-almirah-guide';
 
 interface Props {
   hindi?: boolean;
@@ -12,12 +14,42 @@ const home = Astro.url.pathname === '/' ? '' : '/';
 <a class="skip" href="#main">{hindi ? 'मुख्य सामग्री पर जाएँ' : 'Skip to content'}</a>
 <header class="site-header">
   <div class="wrap header-inner flex items-center justify-between">
-    <a class="brand" href="/" aria-label={hindi ? 'तुलसी अलमारी का मुखपृष्ठ' : 'Tulsi Almirah home'}><img src="/assets/tulsi-logo.webp" width="138" height="83" alt={hindi ? 'तुलसी अलमारी' : showroom.name}></a>
+    <a class="brand" href={home || '#top'} aria-label={hindi ? 'तुलसी अलमारी का मुखपृष्ठ' : 'Tulsi Almirah home'}><img src="/assets/tulsi-logo.webp" width="138" height="83" alt={hindi ? 'तुलसी अलमारी' : showroom.name}></a>
     <nav aria-label={hindi ? 'मुख्य मेन्यू' : 'Main navigation'}>
       <a href={`${home}#services`}>{hindi ? 'सेवाएँ' : 'Services'}</a>
-      <a href={`${home}#collection`}>{hindi ? 'मॉडल' : 'Collection'}</a>
+      <details class="header-catalogue">
+        <summary>{hindi ? 'मॉडल' : 'Collection'}</summary>
+        <ul class="header-catalogue-links">
+          <li><a href={`${home}#collection`}>{hindi ? 'सभी अलमारियाँ' : 'All almirahs'}</a></li>
+          <li><a href={guidePath(hindi ? 'hi' : 'en')}>{hindi ? 'अलमारी खरीदने की गाइड' : 'Buying guide'}</a></li>
+          {collections.map(({ id, label, hindiLabel }) => (
+            <li><a href={collectionPath(id)}>{hindi ? hindiLabel : label}</a></li>
+          ))}
+          <li><a href={`${home}#other-storage`}>{hindi ? 'मुखपृष्ठ पर स्टोरेज के मॉडल' : 'Storage on the homepage'}</a></li>
+        </ul>
+      </details>
       <a href={`${home}#showroom`}>{hindi ? 'शोरूम' : 'Showroom'}</a>
     </nav>
-    <a class="button button-green header-call" href={`tel:${showroom.phone}`}>{hindi ? 'फ़ोन करें' : 'Call the shop'}</a>
+    <a class="button button-light-outline header-call" href={`tel:${showroom.phone}`}>{hindi ? 'फ़ोन करें' : 'Call the shop'}</a>
   </div>
 </header>
+
+<script>
+  const catalogue = document.querySelector<HTMLDetailsElement>('.header-catalogue')!;
+  const summary = catalogue.querySelector('summary')!;
+
+  document.addEventListener('pointerdown', (event) => {
+    if (!catalogue.contains(event.target as Node)) catalogue.open = false;
+  });
+  catalogue.addEventListener('focusout', (event) => {
+    if (event.relatedTarget && !catalogue.contains(event.relatedTarget as Node)) catalogue.open = false;
+  });
+  catalogue.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !catalogue.open) return;
+    catalogue.open = false;
+    summary.focus();
+  });
+  catalogue.addEventListener('click', (event) => {
+    if ((event.target as Element).closest('a')) catalogue.open = false;
+  });
+</script>
